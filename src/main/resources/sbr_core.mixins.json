@@ -1,0 +1,10 @@
+{
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "MixinBlandStandEventHandler",
+    "MixinRefineHandler"
+  ],
+  "package": "net.mrqx.sbr_core.mixin",
+  "required": true
+}
