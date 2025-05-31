@@ -2,9 +2,12 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
+    "AccessorComboState",
     "MixinBlandStandEventHandler",
+    "MixinComboStateBuilder",
     "MixinRefineHandler"
   ],
   "package": "net.mrqx.sbr_core.mixin",
+  "refmap": "sbr_core.refmap.json",
   "required": true
 }

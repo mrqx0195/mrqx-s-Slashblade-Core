@@ -1,0 +1,10 @@
+{
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "AccessorPlayerAnimationOverrider"
+  ],
+  "package": "net.mrqx.sbr_core.mixin.playeranimation",
+  "plugin": "net.mrqx.sbr_core.mixin.playeranimation.PlayerAnimationMixinPlugin",
+  "required": true
+}

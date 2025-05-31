@@ -4,10 +4,12 @@ import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.event.SlashBladeEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
+
+import javax.annotation.Nullable;
 
 public class MrqxSlashBladeEvents extends SlashBladeEvent {
     public MrqxSlashBladeEvents(ItemStack blade, ISlashBladeState state) {
@@ -21,7 +23,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private final SlashBladeEvent.BladeStandAttackEvent originalEvent;
 
         public BladeChangeSpecialEffectEvent(ItemStack blade, ISlashBladeState state, ResourceLocation SEKey,
-                SlashBladeEvent.BladeStandAttackEvent originalEvent) {
+                                             SlashBladeEvent.BladeStandAttackEvent originalEvent) {
             super(blade, state);
             this.SEKey = SEKey;
             this.originalEvent = originalEvent;
@@ -45,7 +47,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             return this.shrinkCount;
         }
 
-        public SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
+        public @Nullable SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
             return originalEvent;
         }
     }
@@ -57,7 +59,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private final SlashBladeEvent.BladeStandAttackEvent originalEvent;
 
         public BladeChangeSpecialAttackEvent(ItemStack blade, ISlashBladeState state, ResourceLocation SAKey,
-                SlashBladeEvent.BladeStandAttackEvent originalEvent) {
+                                             SlashBladeEvent.BladeStandAttackEvent originalEvent) {
             super(blade, state);
             this.SAKey = SAKey;
             this.originalEvent = originalEvent;
@@ -81,7 +83,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             return this.shrinkCount;
         }
 
-        public SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
+        public @Nullable SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
             return originalEvent;
         }
     }
@@ -95,7 +97,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private final SlashBladeEvent.BladeStandAttackEvent originalEvent;
 
         public PreCopySpecialEffectFromBladeEvent(ItemStack blade, ISlashBladeState state, ResourceLocation SEKey,
-                SlashBladeEvent.BladeStandAttackEvent originalEvent, boolean isRemovable, boolean isCopiable) {
+                                                  SlashBladeEvent.BladeStandAttackEvent originalEvent, boolean isRemovable, boolean isCopiable) {
             super(blade, state);
             this.SEKey = SEKey;
             this.isRemovable = isRemovable;
@@ -121,7 +123,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             return this.shrinkCount;
         }
 
-        public SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
+        public @Nullable SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
             return originalEvent;
         }
 
@@ -153,8 +155,8 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private final ItemEntity itemEntity;
 
         public CopySpecialEffectFromBladeEvent(ItemStack blade, ISlashBladeState state, ResourceLocation SEKey,
-                SlashBladeEvent.BladeStandAttackEvent originalEvent, boolean isRemovable, boolean isCopiable,
-                ItemStack orb, ItemEntity itemEntity) {
+                                               SlashBladeEvent.BladeStandAttackEvent originalEvent, boolean isRemovable, boolean isCopiable,
+                                               ItemStack orb, ItemEntity itemEntity) {
             super(blade, state);
             this.SEKey = SEKey;
             this.isRemovable = isRemovable;
@@ -165,7 +167,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
 
         public CopySpecialEffectFromBladeEvent(PreCopySpecialEffectFromBladeEvent pe, ItemStack orb,
-                ItemEntity itemEntity) {
+                                               ItemEntity itemEntity) {
             this(pe.getBlade(), pe.getSlashBladeState(), pe.getSEKey(), pe.getOriginalEvent(), pe.isRemovable(),
                     pe.isCopiable(), orb, itemEntity);
         }
@@ -174,7 +176,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             return SEKey;
         }
 
-        public SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
+        public @Nullable SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
             return originalEvent;
         }
 
@@ -202,7 +204,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private final SlashBladeEvent.BladeStandAttackEvent originalEvent;
 
         public PreCopySpecialAttackFromBladeEvent(ItemStack blade, ISlashBladeState state, ResourceLocation SAKey,
-                SlashBladeEvent.BladeStandAttackEvent originalEvent) {
+                                                  SlashBladeEvent.BladeStandAttackEvent originalEvent) {
             super(blade, state);
             this.SAKey = SAKey;
             this.originalEvent = originalEvent;
@@ -226,7 +228,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             return this.shrinkCount;
         }
 
-        public SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
+        public @Nullable SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
             return originalEvent;
         }
     }
@@ -238,8 +240,8 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private final ItemEntity itemEntity;
 
         public CopySpecialAttackFromBladeEvent(ItemStack blade, ISlashBladeState state, ResourceLocation SAKey,
-                SlashBladeEvent.BladeStandAttackEvent originalEvent,
-                ItemStack orb, ItemEntity itemEntity) {
+                                               SlashBladeEvent.BladeStandAttackEvent originalEvent,
+                                               ItemStack orb, ItemEntity itemEntity) {
             super(blade, state);
             this.SAKey = SAKey;
             this.originalEvent = originalEvent;
@@ -248,7 +250,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
 
         public CopySpecialAttackFromBladeEvent(PreCopySpecialAttackFromBladeEvent pe, ItemStack orb,
-                ItemEntity itemEntity) {
+                                               ItemEntity itemEntity) {
             this(pe.getBlade(), pe.getSlashBladeState(), pe.getSAKey(), pe.getOriginalEvent(), orb, itemEntity);
         }
 
@@ -256,7 +258,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             return SAKey;
         }
 
-        public SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
+        public @Nullable SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
             return originalEvent;
         }
 
@@ -279,8 +281,8 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private final SlashBladeEvent.BladeStandAttackEvent originalEvent;
 
         public ProudSoulEnchantmentEvent(ItemStack blade, ISlashBladeState state,
-                Enchantment enchantment, int enchantLevel, boolean tryNextEnchant, float probability,
-                int totalShrinkCount, SlashBladeEvent.BladeStandAttackEvent originalEvent) {
+                                         Enchantment enchantment, int enchantLevel, boolean tryNextEnchant, float probability,
+                                         int totalShrinkCount, SlashBladeEvent.BladeStandAttackEvent originalEvent) {
             super(blade, state);
             this.enchantment = enchantment;
             this.enchantLevel = enchantLevel;
@@ -335,7 +337,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             return this.probability;
         }
 
-        public SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
+        public @Nullable SlashBladeEvent.BladeStandAttackEvent getOriginalEvent() {
             return originalEvent;
         }
     }
@@ -349,7 +351,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private int refineResult;
 
         public RefineProgressEvent(ItemStack blade, ISlashBladeState state, int materialCost,
-                int levelCost, int costResult, int refineResult, AnvilUpdateEvent originalEvent) {
+                                   int levelCost, int costResult, int refineResult, AnvilUpdateEvent originalEvent) {
             super(blade, state);
             this.materialCost = materialCost;
             this.levelCost = levelCost;
@@ -358,7 +360,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             this.originalEvent = originalEvent;
         }
 
-        public AnvilUpdateEvent getOriginalEvent() {
+        public @Nullable AnvilUpdateEvent getOriginalEvent() {
             return originalEvent;
         }
 
@@ -402,7 +404,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         private int refineResult;
 
         public RefineSettlementEvent(ItemStack blade, ISlashBladeState state, int materialCost, int costResult,
-                int refineResult, AnvilUpdateEvent originalEvent) {
+                                     int refineResult, AnvilUpdateEvent originalEvent) {
             super(blade, state);
             this.materialCost = materialCost;
             this.costResult = costResult;
@@ -410,7 +412,7 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
             this.originalEvent = originalEvent;
         }
 
-        public AnvilUpdateEvent getOriginalEvent() {
+        public @Nullable AnvilUpdateEvent getOriginalEvent() {
             return originalEvent;
         }
 

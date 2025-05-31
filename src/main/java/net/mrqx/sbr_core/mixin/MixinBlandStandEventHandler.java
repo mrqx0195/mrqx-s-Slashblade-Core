@@ -1,12 +1,9 @@
 package net.mrqx.sbr_core.mixin;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.HashMap;
-import java.util.Map;
 import mods.flammpfeil.slashblade.data.tag.SlashBladeItemTags;
 import mods.flammpfeil.slashblade.entity.BladeStandEntity;
-import mods.flammpfeil.slashblade.event.bladestand.BlandStandEventHandler;
 import mods.flammpfeil.slashblade.event.SlashBladeEvent;
+import mods.flammpfeil.slashblade.event.bladestand.BlandStandEventHandler;
 import mods.flammpfeil.slashblade.init.SBItems;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.SlashArtsRegistry;
@@ -19,18 +16,22 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.mrqx.sbr_core.events.MrqxSlashBladeEvents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("null")
 @Mixin(BlandStandEventHandler.class)
@@ -181,6 +182,11 @@ public abstract class MixinBlandStandEventHandler {
             return;
         if (!stack.is(SBItems.proudsoul_crystal))
             return;
+
+        CompoundTag crystalTag = stack.getTag();
+        if (crystalTag != null && crystalTag.contains("SpecialEffectType"))
+            return;
+
         var world = player.level();
         var state = event.getSlashBladeState();
         var bladeStand = event.getBladeStand();

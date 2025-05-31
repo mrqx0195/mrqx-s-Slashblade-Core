@@ -1,10 +1,9 @@
 package net.mrqx.sbr_core.mixin;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import mods.flammpfeil.slashblade.SlashBladeConfig;
 import mods.flammpfeil.slashblade.capability.slashblade.SlashBladeState;
 import mods.flammpfeil.slashblade.event.RefineHandler;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
-import mods.flammpfeil.slashblade.SlashBladeConfig;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AnvilUpdateEvent;
@@ -13,6 +12,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.mrqx.sbr_core.events.MrqxSlashBladeEvents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(RefineHandler.class)
 public abstract class MixinRefineHandler {
