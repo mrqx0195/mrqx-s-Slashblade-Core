@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(ComboState.class)
 public interface AccessorComboState {
     @Invoker("<init>")
-    public static ComboState createComboState(ComboState.Builder builder) {
+    static ComboState createComboState(ComboState.Builder builder) {
         throw new UnsupportedOperationException();
     }
 }
