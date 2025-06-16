@@ -1,4 +1,4 @@
-package net.mrqx.sbr_core.mixin;
+package net.mrqx.sbr_core.mixin.common;
 
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import org.spongepowered.asm.mixin.Mixin;

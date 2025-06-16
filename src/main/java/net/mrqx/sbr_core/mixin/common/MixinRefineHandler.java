@@ -1,4 +1,4 @@
-package net.mrqx.sbr_core.mixin;
+package net.mrqx.sbr_core.mixin.common;
 
 import mods.flammpfeil.slashblade.SlashBladeConfig;
 import mods.flammpfeil.slashblade.capability.slashblade.SlashBladeState;

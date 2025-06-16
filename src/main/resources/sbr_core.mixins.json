@@ -7,7 +7,6 @@
     "MixinComboStateBuilder",
     "MixinRefineHandler"
   ],
-  "package": "net.mrqx.sbr_core.mixin",
-  "refmap": "sbr_core.refmap.json",
+  "package": "net.mrqx.sbr_core.mixin.common",
   "required": true
 }

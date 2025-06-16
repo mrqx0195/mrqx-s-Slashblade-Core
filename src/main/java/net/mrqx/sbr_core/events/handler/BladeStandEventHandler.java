@@ -20,34 +20,41 @@ public class BladeStandEventHandler {
     @SubscribeEvent
     public static void copySAEnchantmentCheck(MrqxSlashBladeEvents.PreCopySpecialAttackFromBladeEvent event) {
         SlashBladeEvent.BladeStandAttackEvent oriEvent = event.getOriginalEvent();
-        if (oriEvent == null)
+        if (oriEvent == null) {
             return;
-        Player player = (Player) oriEvent.getDamageSource().getEntity();
-        ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-        ItemStack blade = event.getBlade();
-        Set<Enchantment> enchantments = EnchantmentHelper.getEnchantments(stack).keySet();
-        boolean flag = false;
-        for (Enchantment e : enchantments) {
-            if (EnchantmentHelper.getTagEnchantmentLevel(e, blade) >= e.getMaxLevel()) {
-                flag = true;
-            }
         }
-        if (!flag) {
-            event.setCanceled(true);
+        Player player = (Player) oriEvent.getDamageSource().getEntity();
+        if (player != null) {
+            ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+
+            ItemStack blade = event.getBlade();
+            Set<Enchantment> enchantments = EnchantmentHelper.getEnchantments(stack).keySet();
+            boolean flag = false;
+            for (Enchantment e : enchantments) {
+                if (EnchantmentHelper.getTagEnchantmentLevel(e, blade) >= e.getMaxLevel()) {
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                event.setCanceled(true);
+            }
         }
     }
 
     @SubscribeEvent
     public static void proudSoulEnchantmentProbabilityCheck(MrqxSlashBladeEvents.ProudSoulEnchantmentEvent event) {
         SlashBladeEvent.BladeStandAttackEvent oriEvent = event.getOriginalEvent();
-        if (oriEvent == null)
+        if (oriEvent == null) {
             return;
+        }
         Player player = (Player) oriEvent.getDamageSource().getEntity();
-        Level world = player.level();
-        RandomSource random = world.getRandom();
+        if (player != null) {
+            Level world = player.level();
+            RandomSource random = world.getRandom();
 
-        if (random.nextFloat() > event.getProbability()) {
-            event.setCanceled(true);
+            if (random.nextFloat() > event.getProbability()) {
+                event.setCanceled(true);
+            }
         }
     }
 }

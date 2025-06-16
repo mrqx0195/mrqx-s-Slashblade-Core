@@ -7,7 +7,7 @@ import net.minecraftforge.eventbus.api.Event;
 import java.util.Map;
 
 public class SlashBladePlayerAnimationRegistryEvent extends Event {
-    private Map<ResourceLocation, VmdAnimation> animation;
+    private final Map<ResourceLocation, VmdAnimation> animation;
 
     public SlashBladePlayerAnimationRegistryEvent(Map<ResourceLocation, VmdAnimation> animation) {
         this.animation = animation;
@@ -15,5 +15,16 @@ public class SlashBladePlayerAnimationRegistryEvent extends Event {
 
     public Map<ResourceLocation, VmdAnimation> getAnimation() {
         return this.animation;
+    }
+
+
+    private static boolean hasInit = false;
+
+    public static boolean hasInit() {
+        return hasInit;
+    }
+
+    public static void setInit() {
+        hasInit = true;
     }
 }
