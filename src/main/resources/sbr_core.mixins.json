@@ -3,9 +3,8 @@
   "minVersion": "0.8",
   "mixins": [
     "AccessorComboState",
-    "MixinBlandStandEventHandler",
     "MixinComboStateBuilder",
-    "MixinRefineHandler"
+    "MixinStunManager"
   ],
   "package": "net.mrqx.sbr_core.mixin.common",
   "required": true

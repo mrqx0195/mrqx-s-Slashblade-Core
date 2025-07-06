@@ -11,12 +11,18 @@ import net.minecraftforge.eventbus.api.Cancelable;
 
 import javax.annotation.Nullable;
 
+@Deprecated
 public class MrqxSlashBladeEvents extends SlashBladeEvent {
     public MrqxSlashBladeEvents(ItemStack blade, ISlashBladeState state) {
         super(blade, state);
     }
 
+
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.bladestand.BladeChangeSpecialEffectEvent} instead.
+     */
     @Cancelable
+    @Deprecated
     public static class BladeChangeSpecialEffectEvent extends MrqxSlashBladeEvents {
         private ResourceLocation SEKey;
         private int shrinkCount = 0;
@@ -52,7 +58,11 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
     }
 
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.bladestand.BladeChangeSpecialAttackEvent} instead.
+     */
     @Cancelable
+    @Deprecated
     public static class BladeChangeSpecialAttackEvent extends MrqxSlashBladeEvents {
         private ResourceLocation SAKey;
         private int shrinkCount = 0;
@@ -88,7 +98,11 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
     }
 
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.bladestand.PreCopySpecialEffectFromBladeEvent} instead.
+     */
     @Cancelable
+    @Deprecated
     public static class PreCopySpecialEffectFromBladeEvent extends MrqxSlashBladeEvents {
         private ResourceLocation SEKey;
         private int shrinkCount = 0;
@@ -146,6 +160,10 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
     }
 
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.bladestand.CopySpecialEffectFromBladeEvent} instead.
+     */
+    @Deprecated
     public static class CopySpecialEffectFromBladeEvent extends MrqxSlashBladeEvents {
         private final ResourceLocation SEKey;
         private final boolean isRemovable;
@@ -197,7 +215,11 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
     }
 
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.bladestand.PreCopySpecialAttackFromBladeEvent} instead.
+     */
     @Cancelable
+    @Deprecated
     public static class PreCopySpecialAttackFromBladeEvent extends MrqxSlashBladeEvents {
         private ResourceLocation SAKey;
         private int shrinkCount = 0;
@@ -233,6 +255,10 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
     }
 
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.bladestand.CopySpecialAttackFromBladeEvent} instead.
+     */
+    @Deprecated
     public static class CopySpecialAttackFromBladeEvent extends MrqxSlashBladeEvents {
         private final ResourceLocation SAKey;
         private final SlashBladeEvent.BladeStandAttackEvent originalEvent;
@@ -271,13 +297,17 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
     }
 
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.bladestand.ProudSoulEnchantmentEvent} instead.
+     */
     @Cancelable
+    @Deprecated
     public static class ProudSoulEnchantmentEvent extends MrqxSlashBladeEvents {
-        private int totalShrinkCount = 0;
-        private float probability = 0;
+        private int totalShrinkCount;
+        private float probability;
         private Enchantment enchantment;
-        private int enchantLevel = 0;
-        private boolean tryNextEnchant = false;
+        private int enchantLevel;
+        private boolean tryNextEnchant;
         private final SlashBladeEvent.BladeStandAttackEvent originalEvent;
 
         public ProudSoulEnchantmentEvent(ItemStack blade, ISlashBladeState state,
@@ -342,9 +372,13 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
     }
 
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.RefineProgressEvent} instead.
+     */
     @Cancelable
+    @Deprecated
     public static class RefineProgressEvent extends MrqxSlashBladeEvents {
-        private AnvilUpdateEvent originalEvent;
+        private final AnvilUpdateEvent originalEvent;
         private int materialCost;
         private int levelCost;
         private final int costResult;
@@ -396,7 +430,11 @@ public class MrqxSlashBladeEvents extends SlashBladeEvent {
         }
     }
 
+    /**
+     * Use {@link mods.flammpfeil.slashblade.event.RefineSettlementEvent} instead.
+     */
     @Cancelable
+    @Deprecated
     public static class RefineSettlementEvent extends MrqxSlashBladeEvents {
         private final AnvilUpdateEvent originalEvent;
         private int materialCost;

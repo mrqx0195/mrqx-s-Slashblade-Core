@@ -12,6 +12,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.2.0'
 }
 
 version = mod_version
@@ -136,13 +137,20 @@ repositories {
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
 
+    flatDir {
+        dir 'libs'
+    }
+
     maven {
         name "KosmX's maven"
         url 'https://maven.kosmx.dev/'
     }
-
-    flatDir {
-        dir 'libs'
+	
+    maven {
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
     }
 }
 
@@ -166,7 +174,7 @@ dependencies {
     // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
     // implementation fg.deobf("mods.flammpfeil.slashblade:SlashBlade_Resharped:${slash_blade_version}")
 
-    implementation fg.deobf("blank:SlashBladeResharped-${minecraft_version}:${slash_blade_version}")
+    implementation fg.deobf("maven.modrinth:slashblade-resharped:${slash_blade_version}")
 
     implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:${player_animation_version}")
 
