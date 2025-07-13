@@ -58,6 +58,7 @@ public class InputStream {
     public boolean checkInputWithTime(InputCommand targetCommand, InputType type, long timeLimit) {
         return checkInputWithPredicate(key -> key.inputCommand.equals(targetCommand)
                 && (key.time + timeLimit >= entity.level().getGameTime())
+                && key.type.equals(type)
         );
     }
 
@@ -118,7 +119,7 @@ public class InputStream {
                 }
 
                 if (nextInput.inputCommand.equals(timelineKey.inputCommand)
-                        && nextInput.type == timelineKey.type
+                        && nextInput.type.equals(timelineKey.type)
                         && nextInput.commands.containsAll(timelineKey.commands)) {
                     currentReferenceTime = nextInput.time;
                     found = true;

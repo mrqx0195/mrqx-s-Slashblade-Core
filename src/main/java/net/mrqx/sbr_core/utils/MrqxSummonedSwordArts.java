@@ -2,7 +2,6 @@ package net.mrqx.sbr_core.utils;
 
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.ability.SummonedSwordArts;
-import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
 import mods.flammpfeil.slashblade.entity.*;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
@@ -102,20 +101,11 @@ public class MrqxSummonedSwordArts {
                 }
             });
 
-    public static final QuadConsumer<LivingEntity, LivingEntity, Double, Integer> HEAVY_RAIN_SWORD = (livingEntity, target, damage, count) ->
-            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+    public static final QuadConsumer<LivingEntity, Vec3, Double, Integer> HEAVY_RAIN_SWORD_POS = (livingEntity, targetPos, damage, count) ->
+            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
                 Level worldIn = livingEntity.level();
                 AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
-                int rank = livingEntity.getCapability(CapabilityConcentrationRank.RANK_POINT).map(r -> r.getRank(worldIn.getGameTime()).level).orElse(0);
-                Vec3 basePos;
-                if (target != null) {
-                    basePos = target.position();
-                } else {
-                    Vec3 forwardDir = calculateViewVector(0, livingEntity.getYRot());
-                    basePos = livingEntity.getPosition(0).add(forwardDir.scale(5));
-                }
-                float yOffset = 7;
-                basePos = basePos.add(0, yOffset, 0);
+                Vec3 basePos = targetPos.add(0, 7, 0);
                 EntityHeavyRainSwords rainSwords = new EntityHeavyRainSwords(SlashBlade.RegistryEvents.HeavyRainSwords, worldIn);
                 rainSwords.setOwner(livingEntity);
                 rainSwords.setColor(state.getColorCode());
@@ -139,7 +129,19 @@ public class MrqxSummonedSwordArts {
                     worldIn.addFreshEntity(heavyRainSwords);
                     livingEntity.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 0.2F, 1.45F);
                 }
+            });
 
+    public static final QuadConsumer<LivingEntity, Entity, Double, Integer> HEAVY_RAIN_SWORD = (livingEntity, target, damage, count) ->
+            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+                AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
+                Vec3 targetPos;
+                if (target != null) {
+                    targetPos = target.position();
+                } else {
+                    Vec3 forwardDir = calculateViewVector(0, livingEntity.getYRot());
+                    targetPos = livingEntity.getPosition(0).add(forwardDir.scale(5));
+                }
+                HEAVY_RAIN_SWORD_POS.accept(livingEntity, targetPos, damage, count);
             });
 
     public static Vec3 calculateViewVector(float x, float y) {
