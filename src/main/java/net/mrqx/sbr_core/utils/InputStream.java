@@ -31,9 +31,17 @@ public class InputStream {
     private void cleanTimeOutInput() {
         long time = entity.level().getGameTime();
         while (!keyStream.isEmpty()) {
-            KeyInput firstKey = keyStream.getLast();
-            if (firstKey.time < time - INPUT_TIMEOUT) {
+            KeyInput lastKey = keyStream.getLast();
+            if (lastKey.time < time - INPUT_TIMEOUT) {
                 keyStream.removeLast();
+            } else {
+                break;
+            }
+        }
+        while (!keyStream.isEmpty()) {
+            KeyInput firstKey = keyStream.getFirst();
+            if (firstKey.time > time) {
+                keyStream.removeFirst();
             } else {
                 break;
             }

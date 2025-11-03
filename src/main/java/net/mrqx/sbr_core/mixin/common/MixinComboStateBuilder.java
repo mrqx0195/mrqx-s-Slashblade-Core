@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ComboState.Builder.class)
 public abstract class MixinComboStateBuilder {
+    @SuppressWarnings("DataFlowIssue")
     @Inject(method = "build()Lmods/flammpfeil/slashblade/registry/combo/ComboState;", at = @At(value = "HEAD"), remap = false)
     public void injectBuild(CallbackInfoReturnable<ComboState> ci) {
         ModLoader.get().postEventWrapContainerInModOrder(new ComboStateRegistryEvent((ComboState.Builder) (Object) this,

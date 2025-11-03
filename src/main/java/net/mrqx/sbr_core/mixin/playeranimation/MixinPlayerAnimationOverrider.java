@@ -15,10 +15,10 @@ import java.util.Map;
 
 @Mixin(PlayerAnimationOverrider.class)
 public abstract class MixinPlayerAnimationOverrider {
-    @Shadow
+    @Shadow(remap = false)
     private Map<ResourceLocation, VmdAnimation> animation;
 
-    @Inject(method = "onBladeAnimationStart(Lmods/flammpfeil/slashblade/event/BladeMotionEvent;)V", at = @At("HEAD"))
+    @Inject(method = "onBladeAnimationStart(Lmods/flammpfeil/slashblade/event/BladeMotionEvent;)V", at = @At("HEAD"), remap = false)
     private void injectInit(CallbackInfo ci) {
         if (!SlashBladePlayerAnimationRegistryEvent.hasInit()) {
             SlashBladePlayerAnimationRegistryEvent.setInit();
