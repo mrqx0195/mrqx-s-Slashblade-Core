@@ -4,6 +4,7 @@
   "mixins": [
     "AccessorComboState",
     "MixinComboStateBuilder",
+    "MixinItemSlashBlade",
     "MixinStunManager"
   ],
   "package": "net.mrqx.sbr_core.mixin.common",
