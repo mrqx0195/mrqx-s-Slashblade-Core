@@ -7,14 +7,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import net.mrqx.sbr_core.entity.EntityAirTrickSummonedSword;
-import net.mrqx.sbr_core.events.ExEnchantmentRegistryEvent;
 import org.slf4j.Logger;
 
 @Mod(MrqxSlashBladeCore.MODID)
@@ -45,11 +43,6 @@ public class MrqxSlashBladeCore {
 
         private static String classToString(Class<? extends Entity> entityClass) {
             return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entityClass.getSimpleName()).replace("entity_", "");
-        }
-
-        @SubscribeEvent
-        public static void test(ExEnchantmentRegistryEvent event) {
-            event.getNewExEnchantments().add(Enchantments.FIRE_PROTECTION);
         }
     }
 }
