@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
+@SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
 @Mixin(ItemSlashBlade.class)
 public abstract class MixinItemSlashBlade {
     @Shadow(remap = false)

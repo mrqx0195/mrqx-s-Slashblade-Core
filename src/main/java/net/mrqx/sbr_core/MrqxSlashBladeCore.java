@@ -10,8 +10,11 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
+import net.mrqx.sbr_core.config.MrqxSlashBladeCoreConfig;
 import net.mrqx.sbr_core.entity.EntityAirTrickSummonedSword;
 import org.slf4j.Logger;
 
@@ -20,12 +23,18 @@ public class MrqxSlashBladeCore {
     public static final String MODID = "sbr_core";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public MrqxSlashBladeCore() {
+    public static ResourceLocation prefix(String s) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, s);
+    }
+
+    public MrqxSlashBladeCore(FMLJavaModLoadingContext modLoadingContext) {
+        modLoadingContext.registerConfig(ModConfig.Type.COMMON, MrqxSlashBladeCoreConfig.COMMON_CONFIG);
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
-        public static final ResourceLocation ENTITY_AIR_TRICK_SUMMONED_SWORD_RESOURCE_LOCATION = new ResourceLocation("sbr_core", classToString(EntityAirTrickSummonedSword.class));
+        public static final ResourceLocation ENTITY_AIR_TRICK_SUMMONED_SWORD_RESOURCE_LOCATION = MrqxSlashBladeCore.prefix(classToString(EntityAirTrickSummonedSword.class));
+        @SuppressWarnings("NotNullFieldNotInitialized")
         public static EntityType<EntityAirTrickSummonedSword> AirTrickSummonedSword;
 
         @SubscribeEvent
@@ -40,7 +49,8 @@ public class MrqxSlashBladeCore {
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(AirTrickSummonedSword, SummonedSwordRenderer::new);
         }
-
+        
+        @SuppressWarnings("SameParameterValue")
         private static String classToString(Class<? extends Entity> entityClass) {
             return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entityClass.getSimpleName()).replace("entity_", "");
         }

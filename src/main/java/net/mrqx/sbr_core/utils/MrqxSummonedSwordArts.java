@@ -134,13 +134,7 @@ public class MrqxSummonedSwordArts {
     public static final QuadConsumer<LivingEntity, Entity, Double, Integer> HEAVY_RAIN_SWORD = (livingEntity, target, damage, count) ->
             livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
                 AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
-                Vec3 targetPos;
-                if (target != null) {
-                    targetPos = target.position();
-                } else {
-                    Vec3 forwardDir = calculateViewVector(0, livingEntity.getYRot());
-                    targetPos = livingEntity.getPosition(0).add(forwardDir.scale(5));
-                }
+                Vec3 targetPos = target.position();
                 HEAVY_RAIN_SWORD_POS.accept(livingEntity, targetPos, damage, count);
             });
 

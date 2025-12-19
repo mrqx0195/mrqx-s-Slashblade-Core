@@ -18,9 +18,16 @@ public class InputStream {
         return inputStream;
     }
 
+    public static void tick(UUID uuid) {
+        if (INPUT_STREAM_MAP.containsKey(uuid)) {
+            INPUT_STREAM_MAP.get(uuid).tickCount++;
+        }
+    }
+
     private final LinkedList<KeyInput> keyStream = new LinkedList<>();
     public final UUID uuid;
     public final Entity entity;
+    public long tickCount = 0;
     private static final long INPUT_TIMEOUT = 20 * 30;
 
     public InputStream(Entity entity) {
@@ -29,7 +36,7 @@ public class InputStream {
     }
 
     private void cleanTimeOutInput() {
-        long time = entity.tickCount;
+        long time = this.tickCount;
         while (!keyStream.isEmpty()) {
             KeyInput lastKey = keyStream.getLast();
             if (lastKey.time < time - INPUT_TIMEOUT) {
@@ -49,7 +56,7 @@ public class InputStream {
     }
 
     public void addInput(InputCommand inputCommand, EnumSet<InputCommand> commands, InputType type) {
-        keyStream.addFirst(new KeyInput(entity.tickCount, inputCommand, commands, type));
+        keyStream.addFirst(new KeyInput(this.tickCount, inputCommand, commands, type));
     }
 
     public boolean checkInputWithPredicate(Predicate<KeyInput> predicate) {
@@ -65,15 +72,15 @@ public class InputStream {
 
     public boolean checkInputWithTime(InputCommand targetCommand, InputType type, long timeLimit) {
         return checkInputWithPredicate(key -> key.inputCommand.equals(targetCommand)
-                && (key.time + timeLimit >= entity.tickCount)
+                && (key.time + timeLimit >= this.tickCount)
                 && key.type.equals(type)
         );
     }
 
     public boolean checkInputWithRangedTime(InputCommand targetCommand, InputType type, long startTimeLimit, long endTimeLimit) {
         return checkInputWithPredicate(key -> key.inputCommand.equals(targetCommand)
-                && (key.time + startTimeLimit >= entity.tickCount)
-                && (key.time + endTimeLimit <= entity.tickCount)
+                && (key.time + startTimeLimit >= this.tickCount)
+                && (key.time + endTimeLimit <= this.tickCount)
                 && key.type.equals(type)
         );
     }
@@ -87,7 +94,7 @@ public class InputStream {
 
     public boolean checkInputWithCommandsAndTime(InputCommand targetCommand, InputType type, long timeLimit, EnumSet<InputCommand> commands) {
         return checkInputWithPredicate(key -> key.inputCommand.equals(targetCommand)
-                && (key.time + timeLimit >= entity.tickCount)
+                && (key.time + timeLimit >= this.tickCount)
                 && key.commands.containsAll(commands)
                 && key.type.equals(type)
         );
@@ -95,8 +102,8 @@ public class InputStream {
 
     public boolean checkInputWithCommandsAndRangedTime(InputCommand targetCommand, InputType type, long startTimeLimit, long endTimeLimit, EnumSet<InputCommand> commands) {
         return checkInputWithPredicate(key -> key.inputCommand.equals(targetCommand)
-                && (key.time + startTimeLimit >= entity.tickCount)
-                && (key.time + endTimeLimit <= entity.tickCount)
+                && (key.time + startTimeLimit >= this.tickCount)
+                && (key.time + endTimeLimit <= this.tickCount)
                 && key.commands.containsAll(commands)
                 && key.type.equals(type)
         );
@@ -109,7 +116,7 @@ public class InputStream {
             return true;
         }
 
-        long currentReferenceTime = entity.tickCount;
+        long currentReferenceTime = this.tickCount;
         Iterator<KeyInput> inputIterator = keyStream.iterator();
 
         for (TimeLineKeyInput timelineKey : inputTimeLine) {

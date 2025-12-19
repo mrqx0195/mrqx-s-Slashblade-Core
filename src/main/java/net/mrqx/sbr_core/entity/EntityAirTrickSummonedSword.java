@@ -10,8 +10,10 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraftforge.network.PlayMessages;
 import net.mrqx.sbr_core.MrqxSlashBladeCore;
 import net.mrqx.sbr_core.utils.MrqxSlayerStyleArts;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
+    @Nullable
     private Entity target;
     private boolean shouldUntouchable;
 
@@ -23,7 +25,7 @@ public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
         return new EntityAirTrickSummonedSword(MrqxSlashBladeCore.RegistryEvents.AirTrickSummonedSword, worldIn);
     }
 
-    public Entity getTarget() {
+    public @Nullable Entity getTarget() {
         return target;
     }
 

@@ -237,6 +237,7 @@ public class MrqxSlayerStyleArts {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @SubscribeEvent
     public static void onLivingTickEvent(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
