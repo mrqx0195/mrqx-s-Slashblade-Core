@@ -25,9 +25,7 @@ public abstract class MixinItemSlashBlade {
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void injectClinit(CallbackInfo ci) {
         if (exEnchantment != null) {
-            ExEnchantmentRegistryEvent event = new ExEnchantmentRegistryEvent(exEnchantment);
-            ModLoader.get().postEventWrapContainerInModOrder(event);
-            exEnchantment = event.getNewExEnchantments();
+            exEnchantment = ModLoader.get().postEventWithReturn(new ExEnchantmentRegistryEvent(exEnchantment)).getNewExEnchantments();
         }
     }
 }
