@@ -1,6 +1,6 @@
 package net.mrqx.sbr_core.mixin.playeranimation;
 
-import org.apache.logging.log4j.util.LoaderUtil;
+import net.minecraftforge.fml.loading.LoadingModList;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -21,7 +21,7 @@ public class PlayerAnimationMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return LoaderUtil.isClassAvailable("mods.flammpfeil.slashblade.compat.playerAnim.PlayerAnimationOverrider");
+        return LoadingModList.get().getModFileById("playeranimator") != null;
     }
 
     @Override

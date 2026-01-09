@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ComboState.class)
 public interface AccessorComboState {
+    @SuppressWarnings("AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc")
     @Invoker("<init>")
     static ComboState createComboState(ComboState.Builder builder) {
         throw new UnsupportedOperationException();

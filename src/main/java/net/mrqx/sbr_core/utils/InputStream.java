@@ -157,7 +157,13 @@ public class InputStream {
     }
 
     public enum InputType {
+        /**
+         * 按下按键
+         */
         START,
+        /**
+         * 弹起按键
+         */
         END
     }
 }
