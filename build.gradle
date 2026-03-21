@@ -120,6 +120,9 @@ dependencies {
 
     modImplementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animation_version}"
 
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0"))
+
     implementation "org.jetbrains:annotations:17.0.0"
 }
 
@@ -192,4 +195,8 @@ idea {
 
 tasks.named('createMinecraftArtifacts') {
     dependsOn tasks.named('generateModMetadata')
+}
+
+java {
+    withSourcesJar()
 }

@@ -3,10 +3,15 @@
   "minVersion": "0.8",
   "mixins": [
     "AccessorComboState",
+    "AccessorMeleeAttackGoal",
+    "AccessorVmdAnimation",
+    "MixinAttackHelper",
     "MixinComboStateBuilder",
     "MixinItemSlashBlade",
-    "MixinStunManager"
+    "MixinStunManager",
+    "MixinTargetSelector"
   ],
   "package": "net.mrqx.sbr_core.mixin.common",
+  "refmap": "sbr_core.refmap.json",
   "required": true
 }

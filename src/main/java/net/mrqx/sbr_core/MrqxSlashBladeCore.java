@@ -16,6 +16,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import net.mrqx.sbr_core.config.MrqxSlashBladeCoreConfig;
 import net.mrqx.sbr_core.entity.EntityAirTrickSummonedSword;
+import net.mrqx.sbr_core.network.NetworkManager;
 import org.slf4j.Logger;
 
 @Mod(MrqxSlashBladeCore.MODID)
@@ -29,6 +30,7 @@ public class MrqxSlashBladeCore {
 
     public MrqxSlashBladeCore(FMLJavaModLoadingContext modLoadingContext) {
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, MrqxSlashBladeCoreConfig.COMMON_CONFIG);
+        NetworkManager.register();
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -49,7 +51,7 @@ public class MrqxSlashBladeCore {
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(AirTrickSummonedSword, SummonedSwordRenderer::new);
         }
-        
+
         @SuppressWarnings("SameParameterValue")
         private static String classToString(Class<? extends Entity> entityClass) {
             return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entityClass.getSimpleName()).replace("entity_", "");

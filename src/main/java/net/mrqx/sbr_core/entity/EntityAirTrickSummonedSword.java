@@ -12,6 +12,8 @@ import net.mrqx.sbr_core.MrqxSlashBladeCore;
 import net.mrqx.sbr_core.utils.MrqxSlayerStyleArts;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
     @Nullable
     private Entity target;
@@ -46,7 +48,7 @@ public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
         super.onHitEntity(entityHitResult);
         if (getOwner() instanceof LivingEntity living) {
             LivingEntity target = living.getLastHurtMob();
-            if (target != null && this.getHitEntity() == target) {
+            if (target != null && Objects.equals(this.getHitEntity(), target)) {
                 MrqxSlayerStyleArts.doAirTrickTeleport(living, target);
             }
         }

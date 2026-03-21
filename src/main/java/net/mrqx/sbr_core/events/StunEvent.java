@@ -6,7 +6,7 @@ import net.minecraftforge.eventbus.api.Cancelable;
 
 @Cancelable
 public class StunEvent extends LivingEvent {
-    private final long duration;
+    private long duration;
 
     public StunEvent(LivingEntity entity, long duration) {
         super(entity);
@@ -15,5 +15,9 @@ public class StunEvent extends LivingEvent {
 
     public long getDuration() {
         return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 }

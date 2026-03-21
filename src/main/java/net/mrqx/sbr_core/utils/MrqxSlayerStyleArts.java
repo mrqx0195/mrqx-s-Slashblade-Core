@@ -79,7 +79,7 @@ public class MrqxSlayerStyleArts {
                     return false;
                 }
 
-                if (target == livingEntity.getLastHurtMob()
+                if (target.equals(livingEntity.getLastHurtMob())
                         && livingEntity.tickCount < livingEntity.getLastHurtMobTimestamp() + 100) {
                     LivingEntity hitEntity = livingEntity.getLastHurtMob();
                     if (hitEntity != null) {
@@ -198,7 +198,7 @@ public class MrqxSlayerStyleArts {
                     serverPlayer.stopSleepInBed(true, true);
                 }
 
-                if (worldIn == entityIn.level()) {
+                if (worldIn.equals(entityIn.level())) {
                     serverPlayer.connection.teleport(x, y, z, yaw, pitch, relativeList);
                 } else {
                     serverPlayer.teleportTo(worldIn, x, y, z, yaw, pitch);
@@ -209,7 +209,7 @@ public class MrqxSlayerStyleArts {
                 float f1 = Mth.wrapDegrees(yaw);
                 float f = Mth.wrapDegrees(pitch);
                 f = Mth.clamp(f, -90.0F, 90.0F);
-                if (worldIn != entityIn.level()) {
+                if (!worldIn.equals(entityIn.level())) {
                     entityIn.unRide();
                     LivingEntity entity = (LivingEntity) entityIn.getType().create(worldIn);
                     if (entity == null) {
