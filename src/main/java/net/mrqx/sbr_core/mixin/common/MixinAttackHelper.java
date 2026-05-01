@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinAttackHelper {
     @SuppressWarnings("EmptyMethod")
     @WrapOperation(method = "attack(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/Entity;F)V",
-            at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackHelper;restoreTargetMotionIfNeeded(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)V", remap = false), remap = false)
-    private static void wrapAttack(Entity serverPlayer, Vec3 target, Operation<Void> original) {
+        at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackHelper;restoreTargetMotionIfNeeded(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)V", remap = false), remap = false)
+    private static void wrapAttack(Entity target, Vec3 originalMotion, Operation<Void> original) {
+        // Do Nothing
     }
 }

@@ -24,7 +24,7 @@ public class ModelUtils {
         renderAction.accept(poseStack);
         poseStack.popPose();
     }
-
+    
     public static void processYoungHumanoidModel(PoseStack poseStack, Consumer<PoseStack> headRenderAction, Consumer<PoseStack> bodyRenderAction) {
         poseStack.pushPose();
         float f = 0.75F;
@@ -39,17 +39,17 @@ public class ModelUtils {
         bodyRenderAction.accept(poseStack);
         poseStack.popPose();
     }
-
+    
     public static <T extends LivingEntity & ISlashBladeEntity,
-            U extends EntityModel<T> & ISlashBladeEntityModel> void processAnimation(T entity, U model) {
+        U extends EntityModel<T> & ISlashBladeEntityModel> void processAnimation(T entity, U model) {
         VanillaConvertedVmdAnimation currentAnimation = entity.getCurrentAnimation();
         if (currentAnimation != null) {
             for (Map.Entry<ModelPart, String> entry : model.getPartMap().entrySet()) {
                 currentAnimation.updatePart(entry.getValue(), entry.getKey());
                 Vec3f rot = currentAnimation.get3DTransform("body", TransformType.ROTATION, new Vec3f(
-                        MathHelper.clampToRadian(model.getBody().xRot),
-                        MathHelper.clampToRadian(model.getBody().yRot),
-                        MathHelper.clampToRadian(model.getBody().zRot)));
+                    MathHelper.clampToRadian(model.getBody().xRot),
+                    MathHelper.clampToRadian(model.getBody().yRot),
+                    MathHelper.clampToRadian(model.getBody().zRot)));
                 model.setBodyRotX(rot.getX());
                 model.setBodyRotY(rot.getY());
                 model.setBodyRotZ(rot.getZ());

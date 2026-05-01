@@ -11,17 +11,17 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unused")
 public class SlashBladeMovementUtils {
     public static final String TRICK_COOL_DOWN = "sbr_core.trickCooldown";
-
+    
     /**
      * 检查是否可发动瞬步类技能
      */
     public static boolean canTrick(LivingEntity maid, boolean powerful) {
         CompoundTag data = maid.getPersistentData();
         return data.getInt(SlashBladeMovementUtils.TRICK_COOL_DOWN) <= 0
-                && SlashBladeAttackUtils.canInterruptCombo(maid, powerful)
-                && maid.getVehicle() == null;
+            && SlashBladeAttackUtils.canInterruptCombo(maid, powerful)
+            && maid.getVehicle() == null;
     }
-
+    
     /**
      * 尝试使用 隔空瞬步
      */
@@ -31,7 +31,7 @@ public class SlashBladeMovementUtils {
         }
         return false;
     }
-
+    
     /**
      * 尝试使用 瞬步退行
      */
@@ -41,7 +41,7 @@ public class SlashBladeMovementUtils {
             MrqxSlayerStyleArts.TRICK_DOWN.apply(livingEntity, true);
         }
     }
-
+    
     /**
      * 尝试使用闪避
      */
@@ -56,7 +56,7 @@ public class SlashBladeMovementUtils {
                 double y = target != null ? target.getY() : livingEntity.getY();
                 double z = livingEntity.getZ() + (random.nextDouble() - 0.5) * 16;
                 if (livingEntity.randomTeleport(x, y, z, false)
-                        && MrqxSlayerStyleArts.TRICK_DODGE.apply(livingEntity, true, false, livingEntity.position())) {
+                    && MrqxSlayerStyleArts.TRICK_DODGE.apply(livingEntity, true, false, livingEntity.position())) {
                     livingEntity.level().broadcastEntityEvent(livingEntity, (byte) 46);
                     break;
                 } else {
@@ -65,7 +65,7 @@ public class SlashBladeMovementUtils {
             }
         }
     }
-
+    
     /**
      * 尝试瞬移至目标
      */
@@ -82,8 +82,8 @@ public class SlashBladeMovementUtils {
                 double y = target.getY();
                 double z = target.getZ() + (random.nextDouble() - 0.5) * reach * 0.8;
                 if (livingEntity.randomTeleport(x, y, z, false)
-                        && MrqxSlayerStyleArts.TRICK_DODGE.apply(livingEntity, true, false, livingEntity.position())
-                        && TargetSelector.getTargettableEntitiesWithinAABB(livingEntity.level(), livingEntity).contains(target)) {
+                    && MrqxSlayerStyleArts.TRICK_DODGE.apply(livingEntity, true, false, livingEntity.position())
+                    && TargetSelector.getTargettableEntitiesWithinAABB(livingEntity.level(), livingEntity).contains(target)) {
                     livingEntity.level().broadcastEntityEvent(livingEntity, (byte) 46);
                     break;
                 } else {
@@ -92,17 +92,17 @@ public class SlashBladeMovementUtils {
             }
         }
     }
-
+    
     public static void tickSlashBladeTrick(LivingEntity livingEntity, Entity target,
                                            boolean canAirTrick, boolean canTrickDown, boolean canTrickDodge, boolean powerful) {
         float distance = livingEntity.distanceTo(target);
         double reach = TargetSelector.getResolvedReach(livingEntity);
         CompoundTag data = livingEntity.getPersistentData();
         data.putInt(TRICK_COOL_DOWN, data.getInt(TRICK_COOL_DOWN) - (powerful ? 2 : 1));
-
+        
         boolean canTrick = SlashBladeMovementUtils.canTrick(livingEntity, powerful);
         boolean hasTrick = false;
-
+        
         if (canAirTrick && distance > reach) {
             if (!SlashBladeMovementUtils.airTrickCheck(livingEntity, distance, reach)) {
                 SlashBladeMovementUtils.tryTrickToTarget(livingEntity, target);
@@ -111,7 +111,7 @@ public class SlashBladeMovementUtils {
             data.putInt(TRICK_COOL_DOWN, 60);
             livingEntity.level().broadcastEntityEvent(livingEntity, (byte) 46);
         }
-
+        
         if (canTrick && !hasTrick) {
             if (canTrickDown && !livingEntity.onGround()) {
                 SlashBladeMovementUtils.trickDownCheck(livingEntity);

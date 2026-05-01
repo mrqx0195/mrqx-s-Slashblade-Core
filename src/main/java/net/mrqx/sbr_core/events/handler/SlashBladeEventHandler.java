@@ -19,22 +19,22 @@ public class SlashBladeEventHandler {
             event.setCanceled(true);
         }
     }
-
+    
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onBladeMotionEventLowPriority(BladeMotionEvent event) {
         if (!event.isCanceled() && !event.getEntity().level().isClientSide() && event.getEntity() instanceof ISlashBladeEntity) {
             event.getEntity().getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
-                    .ifPresent(rank -> {
-                        SlashEntitySyncMessage msg = new SlashEntitySyncMessage();
-                        msg.entityId = event.getEntity().getId();
-                        msg.rawPoint = Math.min(rank.getRankPoint(event.getEntity().level().getGameTime()), rank.getMaxCapacity());
-                        msg.combo = event.getCombo().toString();
-
-                        NetworkManager.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(event::getEntity), msg);
-                    });
+                .ifPresent(rank -> {
+                    SlashEntitySyncMessage msg = new SlashEntitySyncMessage();
+                    msg.entityId = event.getEntity().getId();
+                    msg.rawPoint = Math.min(rank.getRankPoint(event.getEntity().level().getGameTime()), rank.getMaxCapacity());
+                    msg.combo = event.getCombo().toString();
+                    
+                    NetworkManager.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(event::getEntity), msg);
+                });
         }
     }
-
+    
     @SubscribeEvent
     public static void onSlashBladeHitEvent(SlashBladeEvent.HitEvent event) {
         if (event.getUser() instanceof ISlashBladeEntity slashBladeEntity) {

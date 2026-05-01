@@ -10,19 +10,19 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorVmdAnimation {
     @Accessor("loc")
     ResourceLocation sbr_core$getLoc();
-
+    
     @Accessor("start")
     double sbr_core$getStart();
-
+    
     @Accessor("end")
     double sbr_core$getEnd();
-
+    
     @Accessor("loop")
     boolean sbr_core$isLoop();
-
+    
     @Accessor("blendArms")
     boolean sbr_core$isBlendArms();
-
+    
     @Accessor("blendLegs")
     boolean sbr_core$isBlendLegs();
 }

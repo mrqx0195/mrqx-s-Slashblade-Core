@@ -2,16 +2,18 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
-    "AccessorComboState",
-    "AccessorMeleeAttackGoal",
-    "AccessorVmdAnimation",
-    "MixinAttackHelper",
-    "MixinComboStateBuilder",
-    "MixinItemSlashBlade",
-    "MixinStunManager",
-    "MixinTargetSelector"
+    "common.AccessorComboState",
+    "common.AccessorMeleeAttackGoal",
+    "common.AccessorVmdAnimation",
+    "common.MixinAttackHelper",
+    "common.MixinComboStateBuilder",
+    "common.MixinItemSlashBlade",
+    "common.MixinStunManager",
+    "common.MixinTargetSelector"
   ],
-  "package": "net.mrqx.sbr_core.mixin.common",
+  "package": "net.mrqx.sbr_core.mixin",
   "refmap": "sbr_core.refmap.json",
-  "required": true
+  "required": true,
+  "client": [
+  ]
 }

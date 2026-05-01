@@ -14,6 +14,6 @@ public abstract class MixinComboStateBuilder {
     @Inject(method = "build()Lmods/flammpfeil/slashblade/registry/combo/ComboState;", at = @At(value = "HEAD"), remap = false)
     public void injectBuild(CallbackInfoReturnable<ComboState> ci) {
         ModLoader.get().postEvent(new ComboStateRegistryEvent((ComboState.Builder) (Object) this,
-                AccessorComboState.createComboState((ComboState.Builder) (Object) this)));
+            AccessorComboState.createComboState((ComboState.Builder) (Object) this)));
     }
 }

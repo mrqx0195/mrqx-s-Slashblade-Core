@@ -20,7 +20,7 @@ public abstract class MixinItemSlashBlade {
     @Final
     @Mutable
     public static List<Enchantment> exEnchantment;
-
+    
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void injectClinit(CallbackInfo ci) {
         if (exEnchantment != null) {

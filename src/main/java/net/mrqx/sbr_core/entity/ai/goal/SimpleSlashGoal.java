@@ -27,7 +27,7 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
     private ResourceLocation lastComboStateLocation;
     @Nullable
     private Consumer<SimpleSlashGoal<T>> afterSlashConsumer = null;
-
+    
     public SimpleSlashGoal(T mob, double speedModifier, int attackCooldown, boolean followingTargetEvenIfNotSeen) {
         super(mob, speedModifier, followingTargetEvenIfNotSeen);
         this.entity = mob;
@@ -39,7 +39,7 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
         this.canDoJustSlashArts = false;
         this.powerful = false;
     }
-
+    
     public SimpleSlashGoal(T mob, double speedModifier, int attackCooldown, boolean followingTargetEvenIfNotSeen,
                            boolean canRapidSlash, boolean preferAirAttack, boolean canVoidSlash,
                            boolean canDoSlashArts, boolean canDoJustSlashArts, boolean powerful) {
@@ -53,7 +53,7 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
         this.canDoJustSlashArts = canDoJustSlashArts;
         this.powerful = powerful;
     }
-
+    
     @Override
     protected void checkAndPerformAttack(LivingEntity enemy, double distToEnemySqr) {
         double d0 = this.getAttackReachSqr(enemy);
@@ -61,7 +61,7 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
             this.entity.swing(InteractionHand.MAIN_HAND);
             this.doSlashBladeAttack(enemy);
             this.entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-                    this.setLastComboStateLocation(state.getComboSeq()));
+                this.setLastComboStateLocation(state.getComboSeq()));
             if (this instanceof AccessorMeleeAttackGoal accessor) {
                 accessor.sbr_core$setLastCanUseCheck(this.entity.level().getGameTime() - (20 - this.attackCooldown));
                 accessor.sbr_core$setTicksUntilNextAttack(this.attackCooldown);
@@ -71,12 +71,12 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
             }
         }
     }
-
+    
     @Override
     protected double getAttackReachSqr(LivingEntity attackTarget) {
         return this.canRapidSlash ? this.entity.getMeleeAttackRangeSqr(attackTarget) * 3 : this.entity.getMeleeAttackRangeSqr(attackTarget);
     }
-
+    
     protected void doSlashBladeAttack(LivingEntity target) {
         this.entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             state.setTargetEntityId(this.entity.getTarget());
@@ -99,32 +99,32 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
             }
         });
     }
-
+    
     @Override
     public void resetAttackCooldown() {
         super.resetAttackCooldown();
     }
-
+    
     @Override
     public boolean canUse() {
         return super.canUse() && SlashBladeAttackUtils.isHoldingSlashBlade(mob);
     }
-
+    
     @Nullable
     public Consumer<SimpleSlashGoal<T>> getAfterSlashConsumer() {
         return afterSlashConsumer;
     }
-
+    
     public SimpleSlashGoal<T> setAfterSlashConsumer(@Nullable Consumer<SimpleSlashGoal<T>> afterSlashConsumer) {
         this.afterSlashConsumer = afterSlashConsumer;
         return this;
     }
-
+    
     @Nullable
     public ResourceLocation getLastComboStateLocation() {
         return lastComboStateLocation;
     }
-
+    
     protected void setLastComboStateLocation(ResourceLocation lastComboStateLocation) {
         this.lastComboStateLocation = lastComboStateLocation;
     }

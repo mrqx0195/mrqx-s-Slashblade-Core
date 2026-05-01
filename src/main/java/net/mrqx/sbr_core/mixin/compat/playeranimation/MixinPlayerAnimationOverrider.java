@@ -1,4 +1,4 @@
-package net.mrqx.sbr_core.mixin.playeranimation;
+package net.mrqx.sbr_core.mixin.compat.playeranimation;
 
 import mods.flammpfeil.slashblade.compat.playerAnim.PlayerAnimationOverrider;
 import mods.flammpfeil.slashblade.compat.playerAnim.VmdAnimation;
@@ -19,7 +19,7 @@ public abstract class MixinPlayerAnimationOverrider {
     @Final
     @Shadow(remap = false)
     private Map<ResourceLocation, VmdAnimation> animation;
-
+    
     @Inject(method = "onBladeAnimationStart(Lmods/flammpfeil/slashblade/event/BladeMotionEvent;)V", at = @At("HEAD"), remap = false)
     private void injectInit(CallbackInfo ci) {
         if (!SlashBladePlayerAnimationRegistryEvent.hasInit()) {
@@ -27,4 +27,19 @@ public abstract class MixinPlayerAnimationOverrider {
             MinecraftForge.EVENT_BUS.post(new SlashBladePlayerAnimationRegistryEvent(animation));
         }
     }
+
+//    @WrapOperation(method = "onBladeAnimationStart(Lmods/flammpfeil/slashblade/event/BladeMotionEvent;)V",
+//        at = @At(
+//            value = "INVOKE",
+//            target = "Lmods/flammpfeil/slashblade/compat/playerAnim/VmdAnimation;play()V",
+//            remap = false
+//        ),
+//        remap = false
+//    )
+//    private void wrapOnBladeAnimationStart(VmdAnimation instance, Operation<Void> original, @Local(name = "player") AbstractClientPlayer player) {
+//        if (instance instanceof ISlashBladeAnimation slashBladeAnimation) {
+//            player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(slashBladeAnimation::mrqx_s_Slashblade_Core$setSlashBladeState);
+//        }
+//        original.call(instance);
+//    }
 }

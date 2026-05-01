@@ -57,11 +57,11 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
         });
         return mmp;
     });
-
+    
     public LayerSlashEntityBlade(RenderLayerParent<T, M> entityRendererIn) {
         super(entityRendererIn);
     }
-
+    
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     @Override
     public void render(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
@@ -74,25 +74,25 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
             LazyOptional<ISlashBladeState> state = stack.getCapability(CapabilitySlashBlade.BLADESTATE);
             state.ifPresent((s) -> this.motionPlayer.ifPresent((mmp) -> {
                 ComboState combo = ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboSeq()) != null
-                        ? (ComboState) ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboSeq())
-                        : ComboStateRegistry.NONE.get();
-
+                    ? (ComboState) ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboSeq())
+                    : ComboStateRegistry.NONE.get();
+                
                 double time;
                 for (time = TimeValueHelper.getMSecFromTicks((float) Math.max(0L, entity.level().getGameTime() - s.getLastActionTime()) + partialTicks); combo != ComboStateRegistry.NONE.get() && combo != null && (double) combo.getTimeoutMS() < time; combo = ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(combo.getNextOfTimeout(entity)) != null ? (ComboState) ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(combo.getNextOfTimeout(entity)) : ComboStateRegistry.NONE.get()) {
                     time -= combo.getTimeoutMS();
                 }
-
+                
                 if (combo == ComboStateRegistry.NONE.get()) {
                     combo = ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboRoot()) != null ? (ComboState) ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboRoot()) : ComboStateRegistry.STANDBY.get();
                 }
-
+                
                 MmdVmdMotionMc motion = null;
                 if (combo != null) {
                     motion = BladeMotionManager.getInstance().getMotion(combo.getMotionLoc());
                 }
-
+                
                 double maxSeconds = 0.0;
-
+                
                 try {
                     mmp.setVmd(motion);
                     if (motion != null) {
@@ -101,32 +101,32 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
                 } catch (Exception e) {
                     SlashBlade.LOGGER.warn(e);
                 }
-
+                
                 double start = 0.0;
                 if (combo != null) {
                     start = TimeValueHelper.getMSecFromFrames(combo.getStartFrame());
                 }
-
+                
                 double end = 0.0;
                 if (combo != null) {
                     end = TimeValueHelper.getMSecFromFrames(combo.getEndFrame());
                 }
-
+                
                 double span = Math.abs(end - start);
                 span = Math.min(maxSeconds, span);
                 if (combo != null && combo.getLoop()) {
                     time %= span;
                 }
-
+                
                 time = Math.min(span, time);
                 time = start + time;
-
+                
                 try {
                     mmp.updateMotion((float) time);
                 } catch (MmdException e) {
                     SlashBlade.LOGGER.warn(e);
                 }
-
+                
                 try (MSAutoCloser ignored = MSAutoCloser.pushMatrix(matrixStack)) {
                     this.setUserPose(matrixStack, entity, partialTicks);
                     matrixStack.translate(0.0F, motionYOffset, 0.0F);
@@ -134,48 +134,22 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
                     matrixStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
                     ResourceLocation textureLocation = s.getTexture().orElse(DefaultResources.resourceDefaultTexture);
                     WavefrontObject obj = BladeModelManager.getInstance().getModel(s.getModel().orElse(DefaultResources.resourceDefaultModel));
-
+                    
                     try (MSAutoCloser ignored1 = MSAutoCloser.pushMatrix(matrixStack)) {
                         int idx = mmp.getBoneIndexByName("hardpointA");
-                        if (0 <= idx) {
-                            float[] buf = new float[16];
-                            mmp._skinning_mat[idx].getValue(buf);
-                            Matrix4f mat = VectorHelper.matrix4fFromArray(buf);
-                            matrixStack.scale(-1.0F, 1.0F, 1.0F);
-                            PoseStack.Pose entry = matrixStack.last();
-                            entry.pose().mul(mat);
-                            matrixStack.scale(-1.0F, 1.0F, 1.0F);
-                        }
-
-                        float modelScale = (float) (modelScaleBase * (1.0 / motionScale));
-                        matrixStack.scale(modelScale, modelScale, modelScale);
                         String part;
                         if (s.isBroken()) {
                             part = "blade_damaged";
                         } else {
                             part = "blade";
                         }
-
-                        BladeRenderState.renderOverrided(stack, obj, part, textureLocation, matrixStack, bufferIn, lightIn);
-                        BladeRenderState.renderOverridedLuminous(stack, obj, part + "_luminous", textureLocation, matrixStack, bufferIn, lightIn);
+                        renderPart(matrixStack, bufferIn, lightIn, motionScale, modelScaleBase, stack, mmp, textureLocation, obj, idx, part);
                     }
-
+                    
                     try (MSAutoCloser ignored2 = MSAutoCloser.pushMatrix(matrixStack)) {
                         int idx = mmp.getBoneIndexByName("hardpointB");
-                        if (0 <= idx) {
-                            float[] buf = new float[16];
-                            mmp._skinning_mat[idx].getValue(buf);
-                            Matrix4f mat = VectorHelper.matrix4fFromArray(buf);
-                            matrixStack.scale(-1.0F, 1.0F, 1.0F);
-                            PoseStack.Pose entry = matrixStack.last();
-                            entry.pose().mul(mat);
-                            matrixStack.scale(-1.0F, 1.0F, 1.0F);
-                        }
-
-                        float modelScale = (float) (modelScaleBase * (1.0 / motionScale));
-                        matrixStack.scale(modelScale, modelScale, modelScale);
-                        BladeRenderState.renderOverrided(stack, obj, "sheath", textureLocation, matrixStack, bufferIn, lightIn);
-                        BladeRenderState.renderOverridedLuminous(stack, obj, "sheath_luminous", textureLocation, matrixStack, bufferIn, lightIn);
+                        String part = "sheath";
+                        renderPart(matrixStack, bufferIn, lightIn, motionScale, modelScaleBase, stack, mmp, textureLocation, obj, idx, part);
                         if (s.isCharged(entity)) {
                             float f = (float) entity.tickCount + partialTicks;
                             BladeRenderState.renderChargeEffect(stack, f, obj, "effect", ResourceLocation.parse("textures/entity/creeper/creeper_armor.png"), matrixStack, bufferIn, lightIn);
@@ -185,7 +159,25 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
             }));
         }
     }
-
+    
+    private void renderPart(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, double motionScale, double modelScaleBase, ItemStack stack, MmdMotionPlayerGL2 mmp, ResourceLocation textureLocation, WavefrontObject obj, int idx, String part) {
+        if (0 <= idx) {
+            float[] buf = new float[16];
+            mmp._skinning_mat[idx].getValue(buf);
+            Matrix4f mat = VectorHelper.matrix4fFromArray(buf);
+            matrixStack.scale(-1.0F, 1.0F, 1.0F);
+            PoseStack.Pose entry = matrixStack.last();
+            entry.pose().mul(mat);
+            matrixStack.scale(-1.0F, 1.0F, 1.0F);
+        }
+        
+        float modelScale = (float) (modelScaleBase * ((double) 1.0F / motionScale));
+        matrixStack.scale(modelScale, modelScale, modelScale);
+        
+        BladeRenderState.renderOverrided(stack, obj, part, textureLocation, matrixStack, bufferIn, lightIn);
+        BladeRenderState.renderOverridedLuminous(stack, obj, part + "_luminous", textureLocation, matrixStack, bufferIn, lightIn);
+    }
+    
     @Override
     public void setUserPose(PoseStack matrixStack, T entity, float partialTicks) {
         if (entity instanceof ISlashBladeEntity slashBladeEntity) {

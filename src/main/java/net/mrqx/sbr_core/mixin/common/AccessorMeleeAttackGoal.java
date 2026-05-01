@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorMeleeAttackGoal {
     @Accessor("lastCanUseCheck")
     void sbr_core$setLastCanUseCheck(long lastCanUseCheck);
-
+    
     @Accessor("ticksUntilNextAttack")
     void sbr_core$setTicksUntilNextAttack(int ticksUntilNextAttack);
 }

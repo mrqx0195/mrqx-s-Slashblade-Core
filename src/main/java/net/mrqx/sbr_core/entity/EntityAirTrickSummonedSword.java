@@ -18,31 +18,31 @@ public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
     @Nullable
     private Entity target;
     private boolean shouldUntouchable;
-
+    
     public EntityAirTrickSummonedSword(EntityType<? extends Projectile> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
     }
-
+    
     public static EntityAirTrickSummonedSword createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
         return new EntityAirTrickSummonedSword(MrqxSlashBladeCore.RegistryEvents.AirTrickSummonedSword, worldIn);
     }
-
+    
     public @Nullable Entity getTarget() {
         return target;
     }
-
+    
     public void setTarget(Entity target) {
         this.target = target;
     }
-
+    
     public boolean isShouldUntouchable() {
         return shouldUntouchable;
     }
-
+    
     public void setShouldUntouchable(boolean shouldUntouchable) {
         this.shouldUntouchable = shouldUntouchable;
     }
-
+    
     @Override
     protected void onHitEntity(EntityHitResult entityHitResult) {
         super.onHitEntity(entityHitResult);
@@ -53,7 +53,7 @@ public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
             }
         }
     }
-
+    
     @Override
     public void tick() {
         if (this.target != null && this.getPersistentData().getBoolean("doForceHit")) {

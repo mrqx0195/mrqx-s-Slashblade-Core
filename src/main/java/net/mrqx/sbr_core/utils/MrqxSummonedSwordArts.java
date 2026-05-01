@@ -33,7 +33,7 @@ public class MrqxSummonedSwordArts {
         worldIn.addFreshEntity(summonedSword);
         livingEntity.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 0.2F, 1.45F);
     };
-
+    
     public static final TriConsumer<LivingEntity, Double, Integer> SPIRAL_SWORD = (livingEntity, damage, count) -> {
         boolean alreadySummoned = livingEntity.getPassengers().stream().anyMatch(e -> e instanceof EntitySpiralSwords);
         if (alreadySummoned) {
@@ -58,86 +58,86 @@ public class MrqxSummonedSwordArts {
             });
         }
     };
-
+    
     public static final QuadConsumer<LivingEntity, LivingEntity, Double, Integer> STORM_SWORD = (livingEntity, target, damage, count) ->
-            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
-                Level worldIn = livingEntity.level();
-                if (!target.isAlive() || target.isRemoved()) {
-                    return;
-                }
-                AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_STORM_SWORDS);
-                for (int i = 0; i < count; i++) {
-                    EntityStormSwords stormSwords = new EntityStormSwords(SlashBlade.RegistryEvents.StormSwords, worldIn);
-                    stormSwords.setPos(livingEntity.position());
-                    stormSwords.setOwner(livingEntity);
-                    stormSwords.setColor(state.getColorCode());
-                    stormSwords.setRoll(0);
-                    stormSwords.setDamage(damage);
-                    stormSwords.startRiding(target, true);
-                    stormSwords.setDelay(360 / count * i);
-                    worldIn.addFreshEntity(stormSwords);
-                    livingEntity.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 0.2F, 1.45F);
-                }
-            });
-
+        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+            Level worldIn = livingEntity.level();
+            if (!target.isAlive() || target.isRemoved()) {
+                return;
+            }
+            AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_STORM_SWORDS);
+            for (int i = 0; i < count; i++) {
+                EntityStormSwords stormSwords = new EntityStormSwords(SlashBlade.RegistryEvents.StormSwords, worldIn);
+                stormSwords.setPos(livingEntity.position());
+                stormSwords.setOwner(livingEntity);
+                stormSwords.setColor(state.getColorCode());
+                stormSwords.setRoll(0);
+                stormSwords.setDamage(damage);
+                stormSwords.startRiding(target, true);
+                stormSwords.setDelay(360 / count * i);
+                worldIn.addFreshEntity(stormSwords);
+                livingEntity.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 0.2F, 1.45F);
+            }
+        });
+    
     public static final QuadConsumer<LivingEntity, LivingEntity, Double, Integer> BLISTERING_SWORD = (livingEntity, target, damage, count) ->
-            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
-                Level worldIn = livingEntity.level();
-                if (!target.isAlive() || target.isRemoved()) {
-                    return;
-                }
-                AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_BLISTERING_SWORDS);
-                for (int i = 0; i < count; i++) {
-                    EntityBlisteringSwords blisteringSwords = new EntityBlisteringSwords(SlashBlade.RegistryEvents.BlisteringSwords, worldIn);
-                    blisteringSwords.setPos(livingEntity.position());
-                    blisteringSwords.setOwner(livingEntity);
-                    blisteringSwords.setColor(state.getColorCode());
-                    blisteringSwords.setRoll(0);
-                    blisteringSwords.setDamage(damage);
-                    blisteringSwords.startRiding(livingEntity, true);
-                    blisteringSwords.setDelay(i);
-                    worldIn.addFreshEntity(blisteringSwords);
-                    livingEntity.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 0.2F, 1.45F);
-                }
-            });
-
+        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+            Level worldIn = livingEntity.level();
+            if (!target.isAlive() || target.isRemoved()) {
+                return;
+            }
+            AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_BLISTERING_SWORDS);
+            for (int i = 0; i < count; i++) {
+                EntityBlisteringSwords blisteringSwords = new EntityBlisteringSwords(SlashBlade.RegistryEvents.BlisteringSwords, worldIn);
+                blisteringSwords.setPos(livingEntity.position());
+                blisteringSwords.setOwner(livingEntity);
+                blisteringSwords.setColor(state.getColorCode());
+                blisteringSwords.setRoll(0);
+                blisteringSwords.setDamage(damage);
+                blisteringSwords.startRiding(livingEntity, true);
+                blisteringSwords.setDelay(i);
+                worldIn.addFreshEntity(blisteringSwords);
+                livingEntity.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 0.2F, 1.45F);
+            }
+        });
+    
     public static final QuadConsumer<LivingEntity, Vec3, Double, Integer> HEAVY_RAIN_SWORD_POS = (livingEntity, targetPos, damage, count) ->
-            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-                Level worldIn = livingEntity.level();
-                AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
-                Vec3 basePos = targetPos.add(0, 7, 0);
-                EntityHeavyRainSwords rainSwords = new EntityHeavyRainSwords(SlashBlade.RegistryEvents.HeavyRainSwords, worldIn);
-                rainSwords.setOwner(livingEntity);
-                rainSwords.setColor(state.getColorCode());
-                rainSwords.setRoll(0);
-                rainSwords.setDamage(damage);
-                rainSwords.startRiding(livingEntity, true);
-                rainSwords.setDelay(0);
-                rainSwords.setPos(basePos);
-                rainSwords.setXRot(-90);
-                worldIn.addFreshEntity(rainSwords);
-                for (int i = 0; i < count; i++) {
-                    EntityHeavyRainSwords heavyRainSwords = new EntityHeavyRainSwords(SlashBlade.RegistryEvents.HeavyRainSwords, worldIn);
-                    heavyRainSwords.setOwner(livingEntity);
-                    heavyRainSwords.setColor(state.getColorCode());
-                    heavyRainSwords.setRoll(0);
-                    heavyRainSwords.setDamage(damage);
-                    heavyRainSwords.startRiding(livingEntity, true);
-                    heavyRainSwords.setDelay(i);
-                    heavyRainSwords.setSpread(basePos);
-                    heavyRainSwords.setXRot(-90);
-                    worldIn.addFreshEntity(heavyRainSwords);
-                    livingEntity.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 0.2F, 1.45F);
-                }
-            });
-
+        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+            Level worldIn = livingEntity.level();
+            AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
+            Vec3 basePos = targetPos.add(0, 7, 0);
+            EntityHeavyRainSwords rainSwords = new EntityHeavyRainSwords(SlashBlade.RegistryEvents.HeavyRainSwords, worldIn);
+            rainSwords.setOwner(livingEntity);
+            rainSwords.setColor(state.getColorCode());
+            rainSwords.setRoll(0);
+            rainSwords.setDamage(damage);
+            rainSwords.startRiding(livingEntity, true);
+            rainSwords.setDelay(0);
+            rainSwords.setPos(basePos);
+            rainSwords.setXRot(-90);
+            worldIn.addFreshEntity(rainSwords);
+            for (int i = 0; i < count; i++) {
+                EntityHeavyRainSwords heavyRainSwords = new EntityHeavyRainSwords(SlashBlade.RegistryEvents.HeavyRainSwords, worldIn);
+                heavyRainSwords.setOwner(livingEntity);
+                heavyRainSwords.setColor(state.getColorCode());
+                heavyRainSwords.setRoll(0);
+                heavyRainSwords.setDamage(damage);
+                heavyRainSwords.startRiding(livingEntity, true);
+                heavyRainSwords.setDelay(i);
+                heavyRainSwords.setSpread(basePos);
+                heavyRainSwords.setXRot(-90);
+                worldIn.addFreshEntity(heavyRainSwords);
+                livingEntity.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 0.2F, 1.45F);
+            }
+        });
+    
     public static final QuadConsumer<LivingEntity, Entity, Double, Integer> HEAVY_RAIN_SWORD = (livingEntity, target, damage, count) ->
-            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-                AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
-                Vec3 targetPos = target.position();
-                HEAVY_RAIN_SWORD_POS.accept(livingEntity, targetPos, damage, count);
-            });
-
+        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+            AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
+            Vec3 targetPos = target.position();
+            HEAVY_RAIN_SWORD_POS.accept(livingEntity, targetPos, damage, count);
+        });
+    
     public static Vec3 calculateViewVector(float x, float y) {
         float f = x * ((float) Math.PI / 180F);
         float f1 = -y * ((float) Math.PI / 180F);

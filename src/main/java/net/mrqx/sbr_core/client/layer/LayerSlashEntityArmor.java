@@ -17,7 +17,7 @@ public class LayerSlashEntityArmor<T extends LivingEntity & ISlashBladeEntity, M
     public LayerSlashEntityArmor(RenderLayerParent<T, M> renderer, A innerModel, A outerModel, ModelManager modelManager) {
         super(renderer, innerModel, outerModel, modelManager);
     }
-
+    
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         poseStack.pushPose();

@@ -4,7 +4,7 @@ package net.mrqx.sbr_core.utils;
 @SuppressWarnings("AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc")
 public interface QuadConsumer<T, U, V, W> {
     void accept(T var1, U var2, V var3, W var4);
-
+    
     default QuadConsumer<T, U, V, W> andThen(QuadConsumer<? super T, ? super U, ? super V, ? super W> after) {
         return (t, u, v, w) -> {
             this.accept(t, u, v, w);

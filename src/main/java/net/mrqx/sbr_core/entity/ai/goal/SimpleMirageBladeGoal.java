@@ -27,7 +27,7 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
     protected int heavyRainSwordCounter = 0;
     @Nullable
     public LivingEntity target;
-
+    
     public SimpleMirageBladeGoal(T rangedAttackMob, double speedModifier,
                                  boolean canUseBaseSummonedSword, boolean canUseSpiralSword, boolean canUseStormSword,
                                  boolean canUseBlisteringSword, boolean canUseHeavyRainSword) {
@@ -39,12 +39,12 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
         this.canUseBlisteringSword = canUseBlisteringSword;
         this.canUseHeavyRainSword = canUseHeavyRainSword;
     }
-
+    
     @Override
     public boolean isInterruptable() {
         return false;
     }
-
+    
     @Override
     public boolean canUse() {
         LivingEntity livingentity = this.entity.getTarget();
@@ -55,12 +55,12 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
             return false;
         }
     }
-
+    
     @Override
     public boolean canContinueToUse() {
         return this.canUse() || (this.target != null && this.target.isAlive());
     }
-
+    
     @Override
     public void tick() {
         baseSummonedSwordCounter--;
@@ -68,7 +68,7 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
         stormSwordCounter--;
         blisteringSwordCounter--;
         heavyRainSwordCounter--;
-
+        
         if (this.target != null) {
             double enchantPower = this.getPowerLevel();
             this.entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
@@ -105,48 +105,48 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
             });
         }
     }
-
+    
     public double getPowerLevel() {
         return this.entity.getMainHandItem().getEnchantmentLevel(Enchantments.POWER_ARROWS);
     }
-
+    
     public int getBaseSummonedSwordCooldown() {
         return 20;
     }
-
+    
     public int getSpiralSwordCooldown() {
         return 200;
     }
-
+    
     public int getStormSwordCooldown() {
         return 200;
     }
-
+    
     public int getBlisteringSwordCooldown() {
         return 400;
     }
-
+    
     public int getHeavyRainSwordCooldown() {
         return 600;
     }
-
+    
     public int getSpiralSwordCount() {
         return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-                .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
+            .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
     }
-
+    
     public int getStormSwordCount() {
         return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-                .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
+            .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
     }
-
+    
     public int getBlisteringSwordCount() {
         return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-                .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
+            .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
     }
-
+    
     public int getHeavyRainSwordCount() {
         return (9 + Math.min(this.entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-                .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) - 1, 0)) * 2;
+            .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) - 1, 0)) * 2;
     }
 }

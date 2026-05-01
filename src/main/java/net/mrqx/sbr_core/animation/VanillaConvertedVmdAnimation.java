@@ -35,81 +35,81 @@ import java.util.List;
  */
 public class VanillaConvertedVmdAnimation {
     static final LazyOptional<MmdPmdModelMc> ALEX =
-            LazyOptional.of(() -> {
+        LazyOptional.of(() -> {
+            try {
+                return new MmdPmdModelMc(SlashBlade.prefix("model/pa/alex.pmd"));
+            } catch (MmdException | IOException e) {
+                throw new RuntimeException("Error loading PmdModelMc", e);
+            }
+        });
+    
+    static final LazyOptional<MmdMotionPlayerGL2> MOTION_PLAYER =
+        LazyOptional.of(() -> {
+            MmdMotionPlayerGL2 mmp = new MmdMotionPlayerGL2();
+            ALEX.ifPresent(pmd -> {
                 try {
-                    return new MmdPmdModelMc(SlashBlade.prefix("model/pa/alex.pmd"));
-                } catch (MmdException | IOException e) {
-                    throw new RuntimeException("Error loading PmdModelMc", e);
+                    mmp.setPmd(pmd);
+                } catch (MmdException e) {
+                    MrqxSlashBladeCore.LOGGER.error("Error loading PMD Model", e);
                 }
             });
-
-    static final LazyOptional<MmdMotionPlayerGL2> MOTION_PLAYER =
-            LazyOptional.of(() -> {
-                MmdMotionPlayerGL2 mmp = new MmdMotionPlayerGL2();
-                ALEX.ifPresent(pmd -> {
-                    try {
-                        mmp.setPmd(pmd);
-                    } catch (MmdException e) {
-                        MrqxSlashBladeCore.LOGGER.error("Error loading PMD Model", e);
-                    }
-                });
-                return mmp;
-            });
-
+            return mmp;
+        });
+    
     int currentTick;
-
+    
     private float tickDelta = 0f;
-
+    
     final ResourceLocation loc;
     final double start;
     final double end;
     final double span;
     boolean loop;
-
+    
     private boolean isRunning = true;
-
+    
     private boolean blendArms = false;
     private boolean blendLegs = true;
-
+    
     static final List<String> ARMS = Lists.newArrayList("left arm", "right arm");
     static final List<String> LEGS = Lists.newArrayList("left leg", "right leg");
-
-
+    
+    
     public VanillaConvertedVmdAnimation(ResourceLocation loc, double start, double end, boolean loop) {
         this.loc = loc;
         this.start = start;
         this.end = end;
-
+        
         this.span = TimeValueHelper.getTicksFromFrames((float) Math.abs(end - start));
-
+        
         this.loop = loop;
-
+        
         currentTick = 0;
     }
-
+    
     public VanillaConvertedVmdAnimation getClone() {
         VanillaConvertedVmdAnimation tmp = new VanillaConvertedVmdAnimation(this.loc, this.start, this.end, this.loop);
-
+        
         tmp.setBlendArms(this.blendArms);
         tmp.setBlendLegs(this.blendLegs);
         return tmp;
     }
-
+    
     public void setTickDelta(float tickDelta) {
         this.tickDelta = tickDelta;
         this.setupAnim();
     }
-
+    
     public VanillaConvertedVmdAnimation setBlendArms(boolean blend) {
         blendArms = blend;
         return this;
     }
-
+    
     public VanillaConvertedVmdAnimation setBlendLegs(boolean blend) {
         blendLegs = blend;
         return this;
     }
-
+    
     public void tick() {
         if (this.isRunning) {
             this.currentTick++;
@@ -119,56 +119,56 @@ public class VanillaConvertedVmdAnimation {
             }
         }
     }
-
+    
     public void play() {
         this.currentTick = 0;
         this.isRunning = true;
     }
-
+    
     public void stop() {
         this.isRunning = false;
     }
-
+    
     public int getCurrentTick() {
         return currentTick;
     }
-
+    
     public boolean isActive() {
         return this.isRunning;
     }
-
+    
     public void updatePart(String partName, ModelPart part) {
         Vec3f pos = this.get3DTransform(partName, TransformType.POSITION, new Vec3f(part.x, part.y, part.z));
         part.x = pos.getX();
         part.y = pos.getY();
         part.z = pos.getZ();
         Vec3f rot = this.get3DTransform(partName, TransformType.ROTATION, new Vec3f(
-                MathHelper.clampToRadian(part.xRot),
-                MathHelper.clampToRadian(part.yRot),
-                MathHelper.clampToRadian(part.zRot)));
+            MathHelper.clampToRadian(part.xRot),
+            MathHelper.clampToRadian(part.yRot),
+            MathHelper.clampToRadian(part.zRot)));
         part.setRotation(rot.getX(), rot.getY(), rot.getZ());
     }
-
+    
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     public Vec3f get3DTransform(String boneName, TransformType type, Vec3f value0) {
         this.setupAnim();
-
+        
         float finalizeScale = 2.0f;
-
+        
         Vector3f blend = new Vector3f(value0.getX(), value0.getY(), value0.getZ());
-
+        
         boolean b = (!this.blendArms && ARMS.contains(boneName)) || (!this.blendLegs && LEGS.contains(boneName));
         if (type != TransformType.POSITION && b) {
             blend.mul(0);
         }
-
+        
         if (!MOTION_PLAYER.isPresent()) {
             return value0;
         }
         MmdMotionPlayerGL2 mmp = MOTION_PLAYER.orElseThrow(() -> new IllegalStateException("No MOTION_PLAYER present"));
-
+        
         PmdBone bone = mmp.getBoneByName(boneName);
-
+        
         if (bone != null) {
             switch (type) {
                 case POSITION: {
@@ -189,10 +189,10 @@ public class VanillaConvertedVmdAnimation {
                     break;
             }
         }
-
+        
         return value0;
     }
-
+    
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     Vector3d quaternionToEulerZYX(Quaterniond qt) {
         Vector3d tmp = new Vector3d();
@@ -216,15 +216,15 @@ public class VanillaConvertedVmdAnimation {
         tmp.x = Math.atan2(m12, m22);
         return tmp;
     }
-
-
+    
+    
     public void setupAnim() {
         if (!MOTION_PLAYER.isPresent()) {
             return;
         }
-
+        
         MmdMotionPlayerGL2 mmp = MOTION_PLAYER.orElseThrow(() -> new IllegalStateException("MOTION_PLAYER is not present"));
-
+        
         double eofTime = 0;
         MmdVmdMotionMc motion = BladeMotionManager.getInstance().getMotion(loc);
         try {
@@ -233,11 +233,11 @@ public class VanillaConvertedVmdAnimation {
         } catch (Exception e) {
             MrqxSlashBladeCore.LOGGER.error("Failed to set up VMD Motion Animation", e);
         }
-
+        
         double time = TimeValueHelper.getMSecFromTicks(currentTick + this.tickDelta);
         time = Math.min(eofTime, time);
         time = TimeValueHelper.getMSecFromFrames((float) start) + time;
-
+        
         try {
             mmp.updateMotion((float) time);
         } catch (MmdException e) {

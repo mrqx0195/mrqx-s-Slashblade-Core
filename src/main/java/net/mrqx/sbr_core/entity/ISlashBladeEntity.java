@@ -21,47 +21,47 @@ import java.util.stream.Stream;
 public interface ISlashBladeEntity {
     @Nullable
     VanillaConvertedVmdAnimation getCurrentAnimation();
-
+    
     void setCurrentAnimation(@Nullable VanillaConvertedVmdAnimation currentAnimation);
-
+    
     boolean canProgressCombo(LivingEntity target, ResourceLocation current, ResourceLocation next);
-
+    
     boolean canUseCombo(ResourceLocation combo);
-
+    
     Set<Class<? extends Entity>> getAttackableEntities();
-
+    
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     default List<Entity> processTargetList(Level world, LivingEntity attacker, AABB aabb, double reach, List<Entity> originalTargetList) {
         List<Entity> targetList = new ArrayList<>(originalTargetList);
         targetList.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb.inflate(5), IForgeEntity::isMultipartEntity).stream()
-                .flatMap(e -> (e.isMultipartEntity()) ? Stream.of(e.getParts()) : Stream.of(e)).filter(t -> {
-                    boolean result = false;
-                    if (t instanceof LivingEntity living) {
-                        result = attacker.canAttack(living);
-                    } else if (t instanceof PartEntity<?> part) {
-                        if (part.getParent() instanceof LivingEntity living) {
-                            result = attacker.canAttack(living) && part.distanceToSqr(attacker) < (reach * reach);
-                        }
+            .flatMap(e -> (e.isMultipartEntity()) ? Stream.of(e.getParts()) : Stream.of(e)).filter(t -> {
+                boolean result = false;
+                if (t instanceof LivingEntity living) {
+                    result = attacker.canAttack(living);
+                } else if (t instanceof PartEntity<?> part) {
+                    if (part.getParent() instanceof LivingEntity living) {
+                        result = attacker.canAttack(living) && part.distanceToSqr(attacker) < (reach * reach);
                     }
-                    return result;
-                }).toList());
-
+                }
+                return result;
+            }).toList());
+        
         targetList.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb).stream()
-                .flatMap(e -> (e.isMultipartEntity()) ? Stream.of(e.getParts()) : Stream.of(e)).filter(t -> {
-                    boolean result = false;
-                    if (t instanceof LivingEntity living) {
-                        result = attacker.canAttack(living);
-                    } else if (t instanceof PartEntity<?> part) {
-                        if (part.getParent() instanceof LivingEntity living) {
-                            result = attacker.canAttack(living) && part.distanceToSqr(attacker) < (reach * reach);
-                        }
+            .flatMap(e -> (e.isMultipartEntity()) ? Stream.of(e.getParts()) : Stream.of(e)).filter(t -> {
+                boolean result = false;
+                if (t instanceof LivingEntity living) {
+                    result = attacker.canAttack(living);
+                } else if (t instanceof PartEntity<?> part) {
+                    if (part.getParent() instanceof LivingEntity living) {
+                        result = attacker.canAttack(living) && part.distanceToSqr(attacker) < (reach * reach);
                     }
-                    return result;
-                }).toList());
-
+                }
+                return result;
+            }).toList());
+        
         targetList.removeIf(entity -> this.getAttackableEntities().stream().noneMatch(clazz ->
-                clazz.isInstance(entity)));
-
+            clazz.isInstance(entity)));
+        
         attacker.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             Entity target = state.getTargetEntity(world);
             if (target != null) {
@@ -74,23 +74,23 @@ public interface ISlashBladeEntity {
                 targetList.add(target);
             }
         }
-
+        
         targetList.removeIf(entity -> entity.equals(this));
         targetList.removeIf(entity -> entity instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null
-                && ownable.getOwnerUUID().equals(attacker.getUUID()));
+            && ownable.getOwnerUUID().equals(attacker.getUUID()));
         targetList.removeIf(entity -> attacker instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null
-                && ownable.getOwnerUUID().equals(entity.getUUID()));
+            && ownable.getOwnerUUID().equals(entity.getUUID()));
         targetList.removeIf(entity -> entity instanceof OwnableEntity ownable && attacker instanceof OwnableEntity ownableAttacker
-                && ownable.getOwnerUUID() != null && ownableAttacker.getOwnerUUID() != null
-                && ownable.getOwnerUUID().equals(ownableAttacker.getOwnerUUID()));
-        return targetList.stream().distinct().collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+            && ownable.getOwnerUUID() != null && ownableAttacker.getOwnerUUID() != null
+            && ownable.getOwnerUUID().equals(ownableAttacker.getOwnerUUID()));
+        return targetList;
     }
-
+    
     @SuppressWarnings("SameReturnValue")
     default boolean useUpperSlashJump() {
         return false;
     }
-
+    
     @SuppressWarnings("EmptyMethod")
     default void hitEffect(LivingEntity enemy) {
     }

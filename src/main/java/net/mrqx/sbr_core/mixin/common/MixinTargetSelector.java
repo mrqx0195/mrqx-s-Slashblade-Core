@@ -18,19 +18,21 @@ import java.util.List;
 @Mixin(TargetSelector.class)
 public abstract class MixinTargetSelector {
     @Inject(method = "getTargettableEntitiesWithinAABB(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/phys/AABB;D)Ljava/util/List;",
-            at = @At("RETURN"), remap = false)
+        at = @At("RETURN"), remap = false)
     private static void injectGetTargettableEntities(Level world, LivingEntity attacker, AABB aabb, double reach, CallbackInfoReturnable<List<Entity>> cir,
-                                                     @Local(name = "list1") List<Entity> targetList) {
+                                                     @Local(name = "list1") List<Entity> list1) {
         if (attacker instanceof ISlashBladeEntity slashBladeEntity) {
-            List<Entity> list = slashBladeEntity.processTargetList(world, attacker, aabb, reach, targetList).stream().distinct().toList();
-            targetList.clear();
-            targetList.addAll(list);
+            List<Entity> list = slashBladeEntity.processTargetList(world, attacker, aabb, reach, list1).stream().distinct().toList();
+            list1.clear();
+            list1.addAll(list);
         }
     }
-
+    
     /**
      * 我 TM 在写啥
+     * <p>
      * 不要使用 method = getTargettableEntitiesWithinAABB(Lnet/minecraft/world/level/Level;DLnet/minecraft/world/entity/Entity;)Ljava/util/List;
+     * <p>
      * 会注入不进去
      */
     @SuppressWarnings("UnresolvedLocalCapture")

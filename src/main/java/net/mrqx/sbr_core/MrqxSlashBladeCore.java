@@ -23,22 +23,22 @@ import org.slf4j.Logger;
 public class MrqxSlashBladeCore {
     public static final String MODID = "sbr_core";
     public static final Logger LOGGER = LogUtils.getLogger();
-
+    
     public static ResourceLocation prefix(String s) {
         return ResourceLocation.fromNamespaceAndPath(MODID, s);
     }
-
+    
     public MrqxSlashBladeCore(FMLJavaModLoadingContext modLoadingContext) {
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, MrqxSlashBladeCoreConfig.COMMON_CONFIG);
         NetworkManager.register();
     }
-
+    
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
         public static final ResourceLocation ENTITY_AIR_TRICK_SUMMONED_SWORD_RESOURCE_LOCATION = MrqxSlashBladeCore.prefix(classToString(EntityAirTrickSummonedSword.class));
         @SuppressWarnings("NotNullFieldNotInitialized")
         public static EntityType<EntityAirTrickSummonedSword> AirTrickSummonedSword;
-
+        
         @SubscribeEvent
         public static void register(RegisterEvent event) {
             event.register(ForgeRegistries.Keys.ENTITY_TYPES, (entityTypeRegisterHelper) -> {
@@ -46,12 +46,12 @@ public class MrqxSlashBladeCore {
                 entityTypeRegisterHelper.register(ENTITY_AIR_TRICK_SUMMONED_SWORD_RESOURCE_LOCATION, AirTrickSummonedSword);
             });
         }
-
+        
         @SubscribeEvent
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(AirTrickSummonedSword, SummonedSwordRenderer::new);
         }
-
+        
         @SuppressWarnings("SameParameterValue")
         private static String classToString(Class<? extends Entity> entityClass) {
             return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entityClass.getSimpleName()).replace("entity_", "");
