@@ -4,6 +4,7 @@
   "mixins": [
     "common.AccessorComboState",
     "common.AccessorMeleeAttackGoal",
+    "common.AccessorMob",
     "common.AccessorVmdAnimation",
     "common.MixinAttackHelper",
     "common.MixinComboStateBuilder",

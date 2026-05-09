@@ -1,16 +1,16 @@
 package net.mrqx.sbr_core.events.handler;
 
 import mods.flammpfeil.slashblade.SlashBlade;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.events.ComboStateRegistryEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class ComboModifyHandler {
     private static final ResourceLocation UPPER_SLASH_NAME = SlashBlade.prefix("upperslash_jump");
     
@@ -23,7 +23,7 @@ public class ComboModifyHandler {
             && combo.getPriority() == ComboMovementModifiers.UPPER_SLASH.priority) {
             builder.addTickAction(ComboState.TimeLineTickAction.getBuilder().put(9, livingEntity -> {
                 if (livingEntity instanceof ISlashBladeEntity slashBladeEntity && slashBladeEntity.useUpperSlashJump()) {
-                    livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+                    BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
                         state.updateComboSeq(livingEntity, UPPER_SLASH_NAME);
                         AdvancementHelper.grantCriterion(livingEntity, AdvancementHelper.ADVANCEMENT_UPPERSLASH_JUMP);
                     });
@@ -32,7 +32,7 @@ public class ComboModifyHandler {
         }
     }
     
-    @SuppressWarnings({"SameParameterValue", "AlibabaEnumConstantsMustHaveComment"})
+    @SuppressWarnings({"SameParameterValue"})
     private enum ComboMovementModifiers {
         UPPER_SLASH(1600, 1659, 90);
         

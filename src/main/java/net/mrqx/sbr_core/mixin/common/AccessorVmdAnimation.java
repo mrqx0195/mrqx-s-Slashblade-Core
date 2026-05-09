@@ -5,7 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@SuppressWarnings({"AlibabaLowerCamelCaseVariableNaming", "AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc"})
 @Mixin(value = VmdAnimation.class, remap = false)
 public interface AccessorVmdAnimation {
     @Accessor("loc")

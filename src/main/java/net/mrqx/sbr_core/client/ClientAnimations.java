@@ -3,14 +3,11 @@ package net.mrqx.sbr_core.client;
 import com.google.common.collect.Maps;
 import mods.flammpfeil.slashblade.compat.playerAnim.PlayerAnimationOverrider;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.mixin.common.AccessorVmdAnimation;
 
 import java.util.Map;
 
-@OnlyIn(Dist.CLIENT)
 public class ClientAnimations {
     public static final Map<ResourceLocation, VanillaConvertedVmdAnimation> ANIMATION = initAnimations();
     

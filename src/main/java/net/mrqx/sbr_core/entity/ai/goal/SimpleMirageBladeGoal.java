@@ -2,7 +2,7 @@ package net.mrqx.sbr_core.entity.ai.goal;
 
 import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
 import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
@@ -71,7 +71,7 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
         
         if (this.target != null) {
             double enchantPower = this.getPowerLevel();
-            this.entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+            BladeStateAccess.of(this.entity.getMainHandItem()).ifPresent(state -> {
                 if (canUseBaseSummonedSword) {
                     if (baseSummonedSwordCounter <= 0) {
                         MrqxSummonedSwordArts.BASE_SUMMONED_SWORD.accept(this.entity, this.target, enchantPower);
@@ -107,7 +107,7 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
     }
     
     public double getPowerLevel() {
-        return this.entity.getMainHandItem().getEnchantmentLevel(Enchantments.POWER_ARROWS);
+        return this.entity.getMainHandItem().getEnchantmentLevel(this.entity.level().registryAccess().holderOrThrow(Enchantments.POWER));
     }
     
     public int getBaseSummonedSwordCooldown() {
@@ -131,22 +131,22 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
     }
     
     public int getSpiralSwordCount() {
-        return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-            .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
+        return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getData(CapabilityConcentrationRank.RANK_POINT)
+            .getRank(this.entity.level().getGameTime()).level ? 8 : 6;
     }
     
     public int getStormSwordCount() {
-        return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-            .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
+        return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getData(CapabilityConcentrationRank.RANK_POINT)
+            .getRank(this.entity.level().getGameTime()).level ? 8 : 6;
     }
     
     public int getBlisteringSwordCount() {
-        return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-            .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) ? 8 : 6;
+        return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getData(CapabilityConcentrationRank.RANK_POINT)
+            .getRank(this.entity.level().getGameTime()).level ? 8 : 6;
     }
     
     public int getHeavyRainSwordCount() {
-        return (9 + Math.min(this.entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-            .map(r -> r.getRank(this.entity.level().getGameTime()).level).orElse(0) - 1, 0)) * 2;
+        return (9 + Math.min(this.entity.getData(CapabilityConcentrationRank.RANK_POINT)
+            .getRank(this.entity.level().getGameTime()).level - 1, 0)) * 2;
     }
 }

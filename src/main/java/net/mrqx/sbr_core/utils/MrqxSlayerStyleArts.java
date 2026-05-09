@@ -3,7 +3,7 @@ package net.mrqx.sbr_core.utils;
 import mods.flammpfeil.slashblade.ability.SlayerStyleArts;
 import mods.flammpfeil.slashblade.ability.Untouchable;
 import mods.flammpfeil.slashblade.capability.mobeffect.CapabilityMobEffect;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import mods.flammpfeil.slashblade.util.NBTHelper;
@@ -19,25 +19,25 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.mrqx.sbr_core.MrqxSlashBladeCore;
 import net.mrqx.sbr_core.entity.EntityAirTrickSummonedSword;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.BiFunction;
 
-@Mod.EventBusSubscriber
+@SuppressWarnings("unused")
+@EventBusSubscriber
 public class MrqxSlayerStyleArts {
     public final static int TRICK_ACTION_UNTOUCHABLE_TIME = 10;
     public static final String AVOID_TRICK_UP_KEY = "sb.avoid.trickup";
@@ -47,7 +47,7 @@ public class MrqxSlayerStyleArts {
     public static final String AIR_TRICK_TARGET_KEY = "sb.airtrick.target";
     
     public static final TriFunction<LivingEntity, Boolean, Boolean, Boolean> TRICK_UP = (livingEntity, shouldUntouchable, ignoreAvoid) ->
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(state -> {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).map(state -> {
             if (!ignoreAvoid && livingEntity.getPersistentData().getInt(AVOID_TRICK_UP_KEY) != 0) {
                 return false;
             }
@@ -66,8 +66,9 @@ public class MrqxSlayerStyleArts {
             return true;
         }).orElse(false);
     
+    @SuppressWarnings("ConstantValue")
     public static final BiFunction<LivingEntity, Boolean, Boolean> AIR_TRICK = (livingEntity, shouldUntouchable) ->
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(state -> {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).map(state -> {
             Entity tmpTarget = state.getTargetEntity(livingEntity.level());
             Entity target;
             if (tmpTarget != null && tmpTarget.getParts() != null && tmpTarget.getParts().length > 0) {
@@ -120,7 +121,7 @@ public class MrqxSlayerStyleArts {
         }).orElse(false);
     
     public static final BiFunction<LivingEntity, Boolean, Boolean> TRICK_DOWN = (livingEntity, shouldUntouchable) ->
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(state -> {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).map(state -> {
             Vec3 oldPos = livingEntity.position();
             Vec3 motion = new Vec3(0.0F, -512.0F, 0.0F);
             livingEntity.move(MoverType.SELF, motion);
@@ -140,9 +141,9 @@ public class MrqxSlayerStyleArts {
         }).orElse(false);
     
     public static final PropertyDispatch.QuadFunction<LivingEntity, Boolean, Boolean, Vec3, Boolean> TRICK_DODGE = (livingEntity, shouldUntouchable, ignoreAvoid, position) ->
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(state -> {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).map(state -> {
             Level level = livingEntity.level();
-            if (ignoreAvoid || 0 < livingEntity.getCapability(CapabilityMobEffect.MOB_EFFECT).map(ef -> ef.doAvoid(level.getGameTime())).orElse(0)) {
+            if (ignoreAvoid || 0 < livingEntity.getData(CapabilityMobEffect.MOB_EFFECT).doAvoid(level.getGameTime())) {
                 if (shouldUntouchable) {
                     Untouchable.setUntouchable(livingEntity, TRICK_ACTION_UNTOUCHABLE_TIME);
                 }
@@ -175,7 +176,7 @@ public class MrqxSlayerStyleArts {
         
         entityIn.playSound(SoundEvents.ENDERMAN_TELEPORT, 0.75F, 1.25F);
         
-        entityIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.updateComboSeq(entityIn, state.getComboRoot()));
+        BladeStateAccess.of(entityIn.getMainHandItem()).ifPresent(state -> state.updateComboSeq(entityIn, state.getComboRoot()));
         
         Untouchable.setUntouchable(entityIn, TRICK_ACTION_UNTOUCHABLE_TIME);
         
@@ -239,17 +240,17 @@ public class MrqxSlayerStyleArts {
     
     @SuppressWarnings("deprecation")
     @SubscribeEvent
-    public static void onLivingTickEvent(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (entity instanceof Player) {
+    public static void onLivingTickEvent(EntityTickEvent.Post event) {
+        Entity entity = event.getEntity();
+        if (entity instanceof Player || !(entity instanceof LivingEntity livingEntity)) {
             return;
         }
         
         Vec3 deltaMovement;
         
-        Vec3 input = new Vec3(entity.xxa, entity.yya, entity.zza);
+        Vec3 input = new Vec3(livingEntity.xxa, livingEntity.yya, livingEntity.zza);
         double scale = 1.0;
-        float yRot = entity.getYRot();
+        float yRot = livingEntity.getYRot();
         double d0 = input.lengthSqr();
         if (d0 < 1.0E-7D) {
             deltaMovement = Vec3.ZERO;
@@ -265,78 +266,78 @@ public class MrqxSlayerStyleArts {
         boolean doStepUpBoost = true;
         
         Vec3 offset = deltaMovement.normalize().scale(0.5f).add(0, 0.25, 0);
-        BlockPos offsetPos = new BlockPos(VectorHelper.f2i(entity.position().add(offset))).below();
-        BlockState blockState = entity.level().getBlockState(offsetPos);
+        BlockPos offsetPos = new BlockPos(VectorHelper.f2i(livingEntity.position().add(offset))).below();
+        BlockState blockState = livingEntity.level().getBlockState(offsetPos);
         if (blockState.liquid()) {
             doStepUpBoost = false;
         }
-        AttributeInstance stepHeightAttribute = entity.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get());
+        AttributeInstance stepHeightAttribute = livingEntity.getAttribute(Attributes.STEP_HEIGHT);
         if (stepHeightAttribute != null) {
-            AttributeModifier stepUpBonus = new AttributeModifier(UUID.fromString("c8158a43-a96f-4db9-8858-57294fbe0ebb"), "StepUp Bonus", 0.5, AttributeModifier.Operation.ADDITION);
+            AttributeModifier stepUpBonus = new AttributeModifier(MrqxSlashBladeCore.prefix("stepUp_bonus"), 0.5, AttributeModifier.Operation.ADD_VALUE);
             stepHeightAttribute.removeModifier(stepUpBonus);
-            if (doStepUpBoost && (entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).isPresent())) {
+            if (doStepUpBoost && (BladeStateAccess.of(livingEntity.getMainHandItem()).isPresent())) {
                 stepHeightAttribute.addPermanentModifier(stepUpBonus);
             }
         }
         
-        if (entity.onGround() && 0 < entity.getPersistentData().getInt(AVOID_TRICK_UP_KEY)) {
+        if (livingEntity.onGround() && 0 < livingEntity.getPersistentData().getInt(AVOID_TRICK_UP_KEY)) {
             
-            int count = entity.getPersistentData().getInt(AVOID_TRICK_UP_KEY);
+            int count = livingEntity.getPersistentData().getInt(AVOID_TRICK_UP_KEY);
             count--;
             
             if (count <= 0) {
-                entity.getPersistentData().remove(AVOID_TRICK_UP_KEY);
+                livingEntity.getPersistentData().remove(AVOID_TRICK_UP_KEY);
                 
-                if (entity instanceof ServerPlayer) {
-                    ((ServerPlayer) entity).hasChangedDimension();
+                if (livingEntity instanceof ServerPlayer) {
+                    ((ServerPlayer) livingEntity).hasChangedDimension();
                 }
             } else {
-                entity.getPersistentData().putInt(AVOID_TRICK_UP_KEY, count);
+                livingEntity.getPersistentData().putInt(AVOID_TRICK_UP_KEY, count);
             }
         }
         
-        if (entity.getPersistentData().contains(AVOID_COUNTER_KEY)) {
-            int count = entity.getPersistentData().getInt(AVOID_COUNTER_KEY);
+        if (livingEntity.getPersistentData().contains(AVOID_COUNTER_KEY)) {
+            int count = livingEntity.getPersistentData().getInt(AVOID_COUNTER_KEY);
             count--;
             
             if (count <= 0) {
-                if (entity.getPersistentData().contains(AVOID_VEC_KEY)) {
-                    Vec3 pos = NBTHelper.getVector3d(entity.getPersistentData(), AVOID_VEC_KEY);
-                    entity.moveTo(pos);
-                    entity.level().broadcastEntityEvent(entity, (byte) 46);
+                if (livingEntity.getPersistentData().contains(AVOID_VEC_KEY)) {
+                    Vec3 pos = NBTHelper.getVector3d(livingEntity.getPersistentData(), AVOID_VEC_KEY);
+                    livingEntity.moveTo(pos);
+                    livingEntity.level().broadcastEntityEvent(livingEntity, (byte) 46);
                 }
                 
-                entity.getPersistentData().remove(AVOID_COUNTER_KEY);
-                entity.getPersistentData().remove(AVOID_VEC_KEY);
+                livingEntity.getPersistentData().remove(AVOID_COUNTER_KEY);
+                livingEntity.getPersistentData().remove(AVOID_VEC_KEY);
                 
-                if (entity instanceof ServerPlayer) {
-                    ((ServerPlayer) entity).hasChangedDimension();
+                if (livingEntity instanceof ServerPlayer) {
+                    ((ServerPlayer) livingEntity).hasChangedDimension();
                 }
             } else {
-                entity.getPersistentData().putInt(AVOID_COUNTER_KEY, count);
+                livingEntity.getPersistentData().putInt(AVOID_COUNTER_KEY, count);
             }
         }
         
-        if (entity.getPersistentData().contains(AIR_TRICK_COUNTER_KEY)) {
-            int count = entity.getPersistentData().getInt(AIR_TRICK_COUNTER_KEY);
+        if (livingEntity.getPersistentData().contains(AIR_TRICK_COUNTER_KEY)) {
+            int count = livingEntity.getPersistentData().getInt(AIR_TRICK_COUNTER_KEY);
             count--;
             
             if (count <= 0) {
-                if (entity.getPersistentData().contains(AIR_TRICK_TARGET_KEY)) {
-                    int id = entity.getPersistentData().getInt(AIR_TRICK_TARGET_KEY);
+                if (livingEntity.getPersistentData().contains(AIR_TRICK_TARGET_KEY)) {
+                    int id = livingEntity.getPersistentData().getInt(AIR_TRICK_TARGET_KEY);
                     
-                    if (entity.level().getEntity(id) instanceof LivingEntity living) {
-                        executeTeleport(entity, living);
+                    if (livingEntity.level().getEntity(id) instanceof LivingEntity living) {
+                        executeTeleport(livingEntity, living);
                     }
                 }
                 
-                entity.getPersistentData().remove(AIR_TRICK_COUNTER_KEY);
-                entity.getPersistentData().remove(AIR_TRICK_TARGET_KEY);
-                if (entity instanceof ServerPlayer) {
-                    ((ServerPlayer) entity).hasChangedDimension();
+                livingEntity.getPersistentData().remove(AIR_TRICK_COUNTER_KEY);
+                livingEntity.getPersistentData().remove(AIR_TRICK_TARGET_KEY);
+                if (livingEntity instanceof ServerPlayer) {
+                    ((ServerPlayer) livingEntity).hasChangedDimension();
                 }
             } else {
-                entity.getPersistentData().putInt(AIR_TRICK_COUNTER_KEY, count);
+                livingEntity.getPersistentData().putInt(AIR_TRICK_COUNTER_KEY, count);
             }
         }
         

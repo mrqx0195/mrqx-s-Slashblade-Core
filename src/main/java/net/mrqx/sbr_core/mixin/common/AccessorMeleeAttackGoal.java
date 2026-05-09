@@ -4,7 +4,6 @@ import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@SuppressWarnings({"AlibabaLowerCamelCaseVariableNaming", "AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc"})
 @Mixin(MeleeAttackGoal.class)
 public interface AccessorMeleeAttackGoal {
     @Accessor("lastCanUseCheck")

@@ -7,8 +7,7 @@ import jp.nyatla.nymmd.MmdMotionPlayerGL2;
 import jp.nyatla.nymmd.MmdPmdModelMc;
 import jp.nyatla.nymmd.MmdVmdMotionMc;
 import mods.flammpfeil.slashblade.SlashBlade;
-import mods.flammpfeil.slashblade.capability.slashblade.CapabilitySlashBlade;
-import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.client.renderer.layers.LayerMainBlade;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeModelManager;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeMotionManager;
@@ -27,42 +26,49 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.registries.IForgeRegistry;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import org.joml.Matrix4f;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Optional;
 
-@OnlyIn(Dist.CLIENT)
 public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel<T>> extends LayerMainBlade<T, M> {
-    protected final LazyOptional<MmdPmdModelMc> bladeHolder = LazyOptional.of(() -> {
-        try {
-            return new MmdPmdModelMc(SlashBlade.prefix("model/bladeholder.pmd"));
-        } catch (MmdException | IOException e) {
-            throw new RuntimeException("Failed to load blade model!", e);
-        }
-    });
-    protected final LazyOptional<MmdMotionPlayerGL2> motionPlayer = LazyOptional.of(() -> {
-        MmdMotionPlayerGL2 mmp = new MmdMotionPlayerGL2();
-        this.bladeHolder.ifPresent((pmd) -> {
+    @Nullable
+    private MmdPmdModelMc cachedBladeholder;
+    @Nullable
+    private MmdMotionPlayerGL2 cachedMotionPlayer;
+    
+    public Optional<MmdPmdModelMc> getBladeholder() {
+        if (cachedBladeholder == null) {
             try {
-                mmp.setPmd(pmd);
-            } catch (MmdException e) {
-                throw new RuntimeException(e);
+                cachedBladeholder = new MmdPmdModelMc(ResourceLocation.fromNamespaceAndPath(SlashBlade.MODID, "model/bladeholder.pmd"));
+            } catch (IOException | MmdException e) {
+                SlashBlade.LOGGER.warn(e);
             }
-        });
-        return mmp;
-    });
+        }
+        return Optional.ofNullable(cachedBladeholder);
+    }
+    
+    public Optional<MmdMotionPlayerGL2> getMotionPlayer() {
+        if (cachedMotionPlayer == null) {
+            cachedMotionPlayer = new MmdMotionPlayerGL2();
+            this.getBladeholder().ifPresent(bladeHolder -> {
+                try {
+                    cachedMotionPlayer.setPmd(bladeHolder);
+                } catch (MmdException e) {
+                    SlashBlade.LOGGER.warn(e);
+                }
+            });
+        }
+        return Optional.ofNullable(cachedMotionPlayer);
+    }
     
     public LayerSlashEntityBlade(RenderLayerParent<T, M> entityRendererIn) {
         super(entityRendererIn);
     }
     
-    @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     @Override
     public void render(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         this.renderOffhandItem(matrixStack, bufferIn, lightIn, entity);
@@ -71,19 +77,18 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
         double modelScaleBase = 0.0078125;
         ItemStack stack = entity.getItemInHand(InteractionHand.MAIN_HAND);
         if (!stack.isEmpty()) {
-            LazyOptional<ISlashBladeState> state = stack.getCapability(CapabilitySlashBlade.BLADESTATE);
-            state.ifPresent((s) -> this.motionPlayer.ifPresent((mmp) -> {
-                ComboState combo = ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboSeq()) != null
-                    ? (ComboState) ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboSeq())
+            BladeStateAccess.of(stack).ifPresent((s) -> this.getMotionPlayer().ifPresent(mmp -> {
+                ComboState combo = ComboStateRegistry.REGISTRY.get(s.getComboSeq()) != null
+                    ? ComboStateRegistry.REGISTRY.get(s.getComboSeq())
                     : ComboStateRegistry.NONE.get();
                 
                 double time;
-                for (time = TimeValueHelper.getMSecFromTicks((float) Math.max(0L, entity.level().getGameTime() - s.getLastActionTime()) + partialTicks); combo != ComboStateRegistry.NONE.get() && combo != null && (double) combo.getTimeoutMS() < time; combo = ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(combo.getNextOfTimeout(entity)) != null ? (ComboState) ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(combo.getNextOfTimeout(entity)) : ComboStateRegistry.NONE.get()) {
+                for (time = TimeValueHelper.getMSecFromTicks((float) Math.max(0L, entity.level().getGameTime() - s.getLastActionTime()) + partialTicks); combo != ComboStateRegistry.NONE.get() && combo != null && (double) combo.getTimeoutMS() < time; combo = ComboStateRegistry.REGISTRY.get(combo.getNextOfTimeout(entity)) != null ? ComboStateRegistry.REGISTRY.get(combo.getNextOfTimeout(entity)) : ComboStateRegistry.NONE.get()) {
                     time -= combo.getTimeoutMS();
                 }
                 
                 if (combo == ComboStateRegistry.NONE.get()) {
-                    combo = ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboRoot()) != null ? (ComboState) ((IForgeRegistry<?>) ComboStateRegistry.REGISTRY.get()).getValue(s.getComboRoot()) : ComboStateRegistry.STANDBY.get();
+                    combo = ComboStateRegistry.REGISTRY.get(s.getComboRoot()) != null ? ComboStateRegistry.REGISTRY.get(s.getComboRoot()) : ComboStateRegistry.STANDBY.get();
                 }
                 
                 MmdVmdMotionMc motion = null;

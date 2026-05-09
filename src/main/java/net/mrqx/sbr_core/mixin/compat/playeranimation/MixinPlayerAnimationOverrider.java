@@ -3,8 +3,8 @@ package net.mrqx.sbr_core.mixin.compat.playeranimation;
 import mods.flammpfeil.slashblade.compat.playerAnim.PlayerAnimationOverrider;
 import mods.flammpfeil.slashblade.compat.playerAnim.VmdAnimation;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.mrqx.sbr_core.events.SlashBladePlayerAnimationRegistryEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,7 +24,7 @@ public abstract class MixinPlayerAnimationOverrider {
     private void injectInit(CallbackInfo ci) {
         if (!SlashBladePlayerAnimationRegistryEvent.hasInit()) {
             SlashBladePlayerAnimationRegistryEvent.setInit();
-            MinecraftForge.EVENT_BUS.post(new SlashBladePlayerAnimationRegistryEvent(animation));
+            NeoForge.EVENT_BUS.post(new SlashBladePlayerAnimationRegistryEvent(animation));
         }
     }
 

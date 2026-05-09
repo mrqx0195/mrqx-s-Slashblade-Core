@@ -1,14 +1,16 @@
 package net.mrqx.sbr_core.entity.ai.goal;
 
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.util.TargetSelector;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.phys.AABB;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.mixin.common.AccessorMeleeAttackGoal;
+import net.mrqx.sbr_core.mixin.common.AccessorMob;
 import net.mrqx.sbr_core.utils.SlashBladeAttackUtils;
 
 import javax.annotation.Nullable;
@@ -55,12 +57,11 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
     }
     
     @Override
-    protected void checkAndPerformAttack(LivingEntity enemy, double distToEnemySqr) {
-        double d0 = this.getAttackReachSqr(enemy);
-        if (distToEnemySqr <= d0 && this.getTicksUntilNextAttack() <= 0) {
+    protected void checkAndPerformAttack(LivingEntity enemy) {
+        if (this.getAttackBoundingBox().intersects(enemy.getHitbox()) && this.getTicksUntilNextAttack() <= 0) {
             this.entity.swing(InteractionHand.MAIN_HAND);
             this.doSlashBladeAttack(enemy);
-            this.entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
+            BladeStateAccess.of(this.entity.getMainHandItem()).ifPresent(state ->
                 this.setLastComboStateLocation(state.getComboSeq()));
             if (this instanceof AccessorMeleeAttackGoal accessor) {
                 accessor.sbr_core$setLastCanUseCheck(this.entity.level().getGameTime() - (20 - this.attackCooldown));
@@ -72,13 +73,15 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
         }
     }
     
-    @Override
-    protected double getAttackReachSqr(LivingEntity attackTarget) {
-        return this.canRapidSlash ? this.entity.getMeleeAttackRangeSqr(attackTarget) * 3 : this.entity.getMeleeAttackRangeSqr(attackTarget);
+    public AABB getAttackBoundingBox() {
+        AABB attackBoundingBox = ((AccessorMob) this.entity).sbr_core$getAttackBoundingBox();
+        return this.canRapidSlash
+            ? attackBoundingBox.inflate(attackBoundingBox.getXsize() * 2, attackBoundingBox.getYsize() * 2, attackBoundingBox.getZsize() * 2)
+            : attackBoundingBox;
     }
     
     protected void doSlashBladeAttack(LivingEntity target) {
-        this.entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        BladeStateAccess.of(this.entity.getMainHandItem()).ifPresent(state -> {
             state.setTargetEntityId(this.entity.getTarget());
             if (this.entity.distanceTo(target) <= TargetSelector.getResolvedReach(this.entity)) {
                 if (canDoSlashArts) {

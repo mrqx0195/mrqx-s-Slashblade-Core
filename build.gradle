@@ -2,7 +2,7 @@ plugins {
     id 'idea'
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev.legacyforge' version '2.0.91'
+    id 'net.neoforged.moddev' version '2.0.107'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -43,6 +43,10 @@ repositories {
     }
 
     maven {
+        url 'https://jitpack.io'
+    }
+
+    maven {
         name "KosmX's maven"
         url 'https://maven.kosmx.dev/'
     }
@@ -56,8 +60,10 @@ base {
     archivesName = "${mod_file_name}-${minecraft_version}"
 }
 
-legacyForge {
-    version = project.minecraft_version + '-' + project.forge_version
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -68,20 +74,20 @@ legacyForge {
         client {
             client()
             gameDirectory = project.file('run/client')
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
             server()
             gameDirectory = project.file('run/server')
             programArgument '--nogui'
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         gameTestServer {
             type = "gameTestServer"
             gameDirectory = project.file('run/gametest')
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
@@ -93,9 +99,6 @@ legacyForge {
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
-
-            systemProperty 'forge.logging.console.level', 'debug'
-            systemProperty 'mixin.debug.export', 'true'
         }
     }
 
@@ -111,45 +114,28 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
-obfuscation {
-    createRemappingConfiguration(configurations.localRuntime)
-}
 
 dependencies {
-    modImplementation "maven.modrinth:slashblade-resharped:${slash_blade_version}"
+//    modImplementation "maven.modrinth:slashblade-resharped:${slash_blade_version}"
 
-    modImplementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animation_version}"
+//    modImplementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animation_version}"
 
-    modLocalRuntime "maven.modrinth:nbtedit-reborn:tR4Z5Ijy"
+//    modLocalRuntime "maven.modrinth:nbtedit-reborn:tR4Z5Ijy"
 
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0"))
+//    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
+//    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0"))
+    implementation 'com.github.0999312:SlashBlade_Resharped:1.21.1-SNAPSHOT'
+
+    implementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animation_version}"
 
     implementation "org.jetbrains:annotations:17.0.0"
-}
-
-mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
-    config "${mod_id}.mixins.json"
-    config "${mod_id}.playeranimation.mixins.json"
-}
-
-dependencies {
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-}
-
-jar {
-    manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json, ${mod_id}.playeranimation.mixins.json"
-    ])
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
             minecraft_version        : minecraft_version,
             minecraft_version_range  : minecraft_version_range,
-            forge_version            : forge_version,
-            forge_version_range      : forge_version_range,
+            neo_version              : neo_version,
             loader_version_range     : loader_version_range,
             mod_id                   : mod_id,
             mod_name                 : mod_name,
@@ -169,7 +155,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 }
 
 sourceSets.main.resources.srcDir generateModMetadata
-legacyForge.ideSyncTask generateModMetadata
+neoForge.ideSyncTask generateModMetadata
 
 publishing {
     publications {
@@ -193,10 +179,6 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
-}
-
-tasks.named('createMinecraftArtifacts') {
-    dependsOn tasks.named('generateModMetadata')
 }
 
 java {

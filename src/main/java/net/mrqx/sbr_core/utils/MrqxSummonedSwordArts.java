@@ -1,9 +1,9 @@
 package net.mrqx.sbr_core.utils;
 
-import mods.flammpfeil.slashblade.SlashBlade;
+import mods.flammpfeil.slashblade.RegistryEvents;
 import mods.flammpfeil.slashblade.ability.SummonedSwordArts;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.entity.*;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import mods.flammpfeil.slashblade.util.VectorHelper;
 import net.minecraft.sounds.SoundEvents;
@@ -21,12 +21,12 @@ public class MrqxSummonedSwordArts {
         AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_SUMMONEDSWORDS);
         Level worldIn = livingEntity.level();
         Vec3 targetPos = new Vec3(target.getX(), target.getY() + target.getEyeHeight() * 0.5, target.getZ());
-        EntityAbstractSummonedSword summonedSword = new EntityAbstractSummonedSword(SlashBlade.RegistryEvents.SummonedSword, worldIn);
+        EntityAbstractSummonedSword summonedSword = new EntityAbstractSummonedSword(RegistryEvents.SummonedSword, worldIn);
         Vec3 pos = livingEntity.getEyePosition(1.0f).add(VectorHelper.getVectorForRotation(0.0f, livingEntity.getViewYRot(0) + 90).scale(livingEntity.level().random.nextDouble() > 0.5 ? 1 : -1));
         summonedSword.setPos(pos.x, pos.y, pos.z);
         summonedSword.setDamage(damage);
         summonedSword.setOwner(livingEntity);
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> summonedSword.setColor(state.getColorCode()));
+        BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> summonedSword.setColor(state.getColorCode()));
         summonedSword.setRoll(livingEntity.getRandom().nextFloat() * 360.0f);
         Vec3 dir = targetPos.subtract(pos).normalize();
         summonedSword.shoot(dir.x, dir.y, dir.z, 3.0f, 0.0f);
@@ -40,11 +40,11 @@ public class MrqxSummonedSwordArts {
             List<Entity> list = livingEntity.getPassengers().stream().filter(e -> e instanceof EntitySpiralSwords).toList();
             list.forEach(e -> ((EntitySpiralSwords) e).doFire());
         } else {
-            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+            BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent((state) -> {
                 AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_SPIRAL_SWORDS);
                 Level worldIn = livingEntity.level();
                 for (int i = 0; i < count; i++) {
-                    EntitySpiralSwords spiralSwords = new EntitySpiralSwords(SlashBlade.RegistryEvents.SpiralSwords, worldIn);
+                    EntitySpiralSwords spiralSwords = new EntitySpiralSwords(RegistryEvents.SpiralSwords, worldIn);
                     spiralSwords.setPos(livingEntity.position());
                     spiralSwords.setOwner(livingEntity);
                     spiralSwords.setColor(state.getColorCode());
@@ -60,14 +60,14 @@ public class MrqxSummonedSwordArts {
     };
     
     public static final QuadConsumer<LivingEntity, LivingEntity, Double, Integer> STORM_SWORD = (livingEntity, target, damage, count) ->
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent((state) -> {
             Level worldIn = livingEntity.level();
             if (!target.isAlive() || target.isRemoved()) {
                 return;
             }
             AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_STORM_SWORDS);
             for (int i = 0; i < count; i++) {
-                EntityStormSwords stormSwords = new EntityStormSwords(SlashBlade.RegistryEvents.StormSwords, worldIn);
+                EntityStormSwords stormSwords = new EntityStormSwords(RegistryEvents.StormSwords, worldIn);
                 stormSwords.setPos(livingEntity.position());
                 stormSwords.setOwner(livingEntity);
                 stormSwords.setColor(state.getColorCode());
@@ -81,14 +81,14 @@ public class MrqxSummonedSwordArts {
         });
     
     public static final QuadConsumer<LivingEntity, LivingEntity, Double, Integer> BLISTERING_SWORD = (livingEntity, target, damage, count) ->
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent((state) -> {
             Level worldIn = livingEntity.level();
             if (!target.isAlive() || target.isRemoved()) {
                 return;
             }
             AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_BLISTERING_SWORDS);
             for (int i = 0; i < count; i++) {
-                EntityBlisteringSwords blisteringSwords = new EntityBlisteringSwords(SlashBlade.RegistryEvents.BlisteringSwords, worldIn);
+                EntityBlisteringSwords blisteringSwords = new EntityBlisteringSwords(RegistryEvents.BlisteringSwords, worldIn);
                 blisteringSwords.setPos(livingEntity.position());
                 blisteringSwords.setOwner(livingEntity);
                 blisteringSwords.setColor(state.getColorCode());
@@ -102,11 +102,11 @@ public class MrqxSummonedSwordArts {
         });
     
     public static final QuadConsumer<LivingEntity, Vec3, Double, Integer> HEAVY_RAIN_SWORD_POS = (livingEntity, targetPos, damage, count) ->
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
             Level worldIn = livingEntity.level();
             AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
             Vec3 basePos = targetPos.add(0, 7, 0);
-            EntityHeavyRainSwords rainSwords = new EntityHeavyRainSwords(SlashBlade.RegistryEvents.HeavyRainSwords, worldIn);
+            EntityHeavyRainSwords rainSwords = new EntityHeavyRainSwords(RegistryEvents.HeavyRainSwords, worldIn);
             rainSwords.setOwner(livingEntity);
             rainSwords.setColor(state.getColorCode());
             rainSwords.setRoll(0);
@@ -117,7 +117,7 @@ public class MrqxSummonedSwordArts {
             rainSwords.setXRot(-90);
             worldIn.addFreshEntity(rainSwords);
             for (int i = 0; i < count; i++) {
-                EntityHeavyRainSwords heavyRainSwords = new EntityHeavyRainSwords(SlashBlade.RegistryEvents.HeavyRainSwords, worldIn);
+                EntityHeavyRainSwords heavyRainSwords = new EntityHeavyRainSwords(RegistryEvents.HeavyRainSwords, worldIn);
                 heavyRainSwords.setOwner(livingEntity);
                 heavyRainSwords.setColor(state.getColorCode());
                 heavyRainSwords.setRoll(0);
@@ -132,7 +132,7 @@ public class MrqxSummonedSwordArts {
         });
     
     public static final QuadConsumer<LivingEntity, Entity, Double, Integer> HEAVY_RAIN_SWORD = (livingEntity, target, damage, count) ->
-        livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
             AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_HEAVY_RAIN_SWORDS);
             Vec3 targetPos = target.position();
             HEAVY_RAIN_SWORD_POS.accept(livingEntity, targetPos, damage, count);

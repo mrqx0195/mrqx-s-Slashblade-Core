@@ -2,8 +2,8 @@ package net.mrqx.sbr_core.events;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.fml.event.IModBusEvent;
+import net.neoforged.bus.api.Event;
+import net.neoforged.fml.event.IModBusEvent;
 
 import java.util.ArrayList;
 import java.util.List;

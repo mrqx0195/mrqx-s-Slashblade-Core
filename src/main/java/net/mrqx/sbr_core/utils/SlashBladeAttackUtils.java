@@ -1,29 +1,21 @@
 package net.mrqx.sbr_core.utils;
 
-import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
-import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.event.SlashBladeEvent;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.slasharts.SlashArts;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import mods.flammpfeil.slashblade.util.KnockBacks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
-import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
-import net.mrqx.sbr_core.client.ClientAnimations;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,15 +27,15 @@ public class SlashBladeAttackUtils {
     public static final String SUPER_JUDGEMENT_CUT_COUNTER_KEY = "sbr_core.superJudgementCutCounter";
     
     public static boolean isHoldingSlashBlade(LivingEntity livingEntity) {
-        return !livingEntity.getMainHandItem().isEmpty() && livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).isPresent();
+        return !livingEntity.getMainHandItem().isEmpty() && BladeStateAccess.of(livingEntity.getMainHandItem()).isPresent();
     }
     
     public static boolean canInterruptCombo(LivingEntity livingEntity, boolean powerful) {
-        return livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(state -> {
+        return BladeStateAccess.of(livingEntity.getMainHandItem()).map(state -> {
             ResourceLocation currentLoc = state.resolvCurrentComboState(livingEntity);
-            ComboState current = ComboStateRegistry.REGISTRY.get().getValue(currentLoc);
+            ComboState current = ComboStateRegistry.REGISTRY.get(currentLoc);
             if (current != null) {
-                ComboState next = ComboStateRegistry.REGISTRY.get().getValue(current.getNextOfTimeout(livingEntity));
+                ComboState next = ComboStateRegistry.REGISTRY.get(current.getNextOfTimeout(livingEntity));
                 if (powerful) {
                     return !ADVANCE_UNINTERRUPTIBLE_COMBO.contains(current) && !ADVANCE_UNINTERRUPTIBLE_COMBO.contains(next);
                 }
@@ -84,7 +76,7 @@ public class SlashBladeAttackUtils {
     
     public static void rapidSlashAttack(LivingEntity livingEntity, ISlashBladeState state, LivingEntity target) {
         ResourceLocation currentLoc = state.resolvCurrentComboState(livingEntity);
-        ComboState current = ComboStateRegistry.REGISTRY.get().getValue(currentLoc);
+        ComboState current = ComboStateRegistry.REGISTRY.get(currentLoc);
         livingEntity.lookAt(EntityAnchorArgument.Anchor.FEET, target.position());
         if (current != null) {
             ResourceLocation next = current.getNext(livingEntity);
@@ -109,10 +101,10 @@ public class SlashBladeAttackUtils {
         }
         ResourceLocation comboLoc = state.getSlashArts().doArts(type, livingEntity);
         SlashBladeEvent.PerformSlashArtEvent event = new SlashBladeEvent.PerformSlashArtEvent(livingEntity, elapsed, state, comboLoc, type);
-        MinecraftForge.EVENT_BUS.post(event);
+        NeoForge.EVENT_BUS.post(event);
         if (!event.isCanceled()) {
             comboLoc = event.getComboState();
-            ComboState combo = ComboStateRegistry.REGISTRY.get().getValue(comboLoc);
+            ComboState combo = ComboStateRegistry.REGISTRY.get(comboLoc);
             if (combo != null && !Objects.equals(comboLoc, ComboStateRegistry.NONE.getId())) {
                 state.updateComboSeq(livingEntity, comboLoc);
                 return true;
@@ -126,9 +118,9 @@ public class SlashBladeAttackUtils {
             return false;
         }
         ResourceLocation currentLoc = state.resolvCurrentComboState(livingEntity);
-        ComboState current = ComboStateRegistry.REGISTRY.get().getValue(currentLoc);
+        ComboState current = ComboStateRegistry.REGISTRY.get(currentLoc);
         if (current != null) {
-            ComboState next = ComboStateRegistry.REGISTRY.get().getValue(current.getNextOfTimeout(livingEntity));
+            ComboState next = ComboStateRegistry.REGISTRY.get(current.getNextOfTimeout(livingEntity));
             if (powerful && ADVANCE_CHARGE_COMBO.contains(current)) {
                 return doSlashArts(livingEntity, state, target, isJust);
             } else if (isJust && QUICK_CHARGE_COMBO.contains(current)) {
@@ -152,7 +144,7 @@ public class SlashBladeAttackUtils {
     public static void normalSlashBladeAttack(LivingEntity livingEntity, ISlashBladeState state, LivingEntity target,
                                               boolean canRapidSlash, boolean preferAirAttack, boolean canVoidSlash, boolean powerful) {
         ResourceLocation currentLoc = state.resolvCurrentComboState(livingEntity);
-        ComboState current = ComboStateRegistry.REGISTRY.get().getValue(currentLoc);
+        ComboState current = ComboStateRegistry.REGISTRY.get(currentLoc);
         CompoundTag data = livingEntity.getPersistentData();
         livingEntity.lookAt(EntityAnchorArgument.Anchor.FEET, target.position());
         if (current != null) {
@@ -182,37 +174,6 @@ public class SlashBladeAttackUtils {
                 }
             }
         }
-    }
-    
-    @OnlyIn(Dist.CLIENT)
-    public static TriConsumer<Long, Integer, String> syncClientEntity() {
-        return (point, entityId, combo) -> {
-            if (Minecraft.getInstance().level != null) {
-                Entity entity = Minecraft.getInstance().level.getEntity(entityId);
-                if (entity instanceof ISlashBladeEntity slashBladeEntity) {
-                    entity.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent(cr -> {
-                        long time = entity.level().getGameTime();
-                        IConcentrationRank.ConcentrationRanks oldRank = cr.getRank(time);
-                        cr.setRawRankPoint(point);
-                        cr.setLastUpdte(time);
-                        if (oldRank.level < cr.getRank(time).level) {
-                            cr.setLastRankRise(time);
-                        }
-                    });
-                    ComboState state = ComboStateRegistry.REGISTRY.get().getValue(ResourceLocation.tryParse(combo));
-                    if (state == null) {
-                        return;
-                    }
-                    ResourceLocation animation = ComboState.getRegistryKey(state);
-                    if (animation != null) {
-                        VanillaConvertedVmdAnimation vmdAnimation = ClientAnimations.ANIMATION.get(animation);
-                        if (vmdAnimation != null) {
-                            slashBladeEntity.setCurrentAnimation(vmdAnimation.getClone());
-                        }
-                    }
-                }
-            }
-        };
     }
     
     public static final Set<ComboState> CHARGE_COMBO = new HashSet<>(Set.of(

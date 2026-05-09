@@ -2,7 +2,7 @@ package net.mrqx.sbr_core.events;
 
 import mods.flammpfeil.slashblade.compat.playerAnim.VmdAnimation;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 import java.util.Map;
 

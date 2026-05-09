@@ -7,8 +7,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraftforge.network.PlayMessages;
-import net.mrqx.sbr_core.MrqxSlashBladeCore;
 import net.mrqx.sbr_core.utils.MrqxSlayerStyleArts;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,10 +19,6 @@ public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
     
     public EntityAirTrickSummonedSword(EntityType<? extends Projectile> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
-    }
-    
-    public static EntityAirTrickSummonedSword createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntityAirTrickSummonedSword(MrqxSlashBladeCore.RegistryEvents.AirTrickSummonedSword, worldIn);
     }
     
     public @Nullable Entity getTarget() {

@@ -1,11 +1,10 @@
 package net.mrqx.sbr_core.events;
 
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
 
-@Cancelable
-public class StunEvent extends LivingEvent {
+public class StunEvent extends LivingEvent implements ICancellableEvent {
     private long duration;
     
     public StunEvent(LivingEntity entity, long duration) {

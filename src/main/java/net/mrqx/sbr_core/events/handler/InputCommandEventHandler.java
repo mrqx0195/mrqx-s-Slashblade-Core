@@ -2,14 +2,14 @@ package net.mrqx.sbr_core.events.handler;
 
 import mods.flammpfeil.slashblade.event.handler.InputCommandEvent;
 import mods.flammpfeil.slashblade.util.InputCommand;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.mrqx.sbr_core.utils.InputStream;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import java.util.EnumSet;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class InputCommandEventHandler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onInputCommandEvent(InputCommandEvent event) {

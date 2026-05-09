@@ -7,8 +7,6 @@ import dev.kosmx.playerAnim.core.util.Vec3f;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.client.model.ISlashBladeEntityModel;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
@@ -16,7 +14,6 @@ import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@OnlyIn(Dist.CLIENT)
 public class ModelUtils {
     public static void processSlashModel(PoseStack poseStack, ISlashBladeEntityModel model, Consumer<PoseStack> renderAction) {
         poseStack.pushPose();

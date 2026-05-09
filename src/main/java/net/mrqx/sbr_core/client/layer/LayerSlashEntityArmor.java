@@ -7,12 +7,9 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.client.model.ISlashBladeEntityModel;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 
-@OnlyIn(Dist.CLIENT)
 public class LayerSlashEntityArmor<T extends LivingEntity & ISlashBladeEntity, M extends HumanoidModel<T> & ISlashBladeEntityModel, A extends HumanoidModel<T> & ISlashBladeEntityModel> extends HumanoidArmorLayer<T, M, A> {
     public LayerSlashEntityArmor(RenderLayerParent<T, M> renderer, A innerModel, A outerModel, ModelManager modelManager) {
         super(renderer, innerModel, outerModel, modelManager);

@@ -1,14 +1,14 @@
 package net.mrqx.sbr_core.events.handler;
 
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.mrqx.sbr_core.utils.InputStream;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class TickHandler {
     @SubscribeEvent
-    public static void onLivingTickEvent(LivingEvent.LivingTickEvent event) {
+    public static void onLivingTickEvent(EntityTickEvent.Post event) {
         InputStream.tick(event.getEntity().getUUID());
     }
 }

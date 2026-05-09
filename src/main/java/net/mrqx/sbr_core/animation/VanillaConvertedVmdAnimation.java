@@ -15,12 +15,12 @@ import mods.flammpfeil.slashblade.client.renderer.model.BladeMotionManager;
 import mods.flammpfeil.slashblade.util.TimeValueHelper;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.LazyOptional;
 import net.mrqx.sbr_core.MrqxSlashBladeCore;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 
@@ -34,27 +34,32 @@ import java.util.List;
  * @author baguchi
  */
 public class VanillaConvertedVmdAnimation {
-    static final LazyOptional<MmdPmdModelMc> ALEX =
-        LazyOptional.of(() -> {
-            try {
-                return new MmdPmdModelMc(SlashBlade.prefix("model/pa/alex.pmd"));
-            } catch (MmdException | IOException e) {
-                throw new RuntimeException("Error loading PmdModelMc", e);
-            }
-        });
+    @Nullable
+    public static final MmdPmdModelMc ALEX;
     
-    static final LazyOptional<MmdMotionPlayerGL2> MOTION_PLAYER =
-        LazyOptional.of(() -> {
-            MmdMotionPlayerGL2 mmp = new MmdMotionPlayerGL2();
-            ALEX.ifPresent(pmd -> {
-                try {
-                    mmp.setPmd(pmd);
-                } catch (MmdException e) {
-                    MrqxSlashBladeCore.LOGGER.error("Error loading PMD Model", e);
-                }
-            });
-            return mmp;
-        });
+    @Nullable
+    public static final MmdMotionPlayerGL2 MOTION_PLAYER;
+    
+    static {
+        MmdPmdModelMc tmpAlex = null;
+        try {
+            tmpAlex = new MmdPmdModelMc(ResourceLocation.fromNamespaceAndPath(SlashBlade.MODID, "model/pa/alex.pmd"));
+        } catch (IOException | MmdException e) {
+            SlashBlade.LOGGER.warn(e);
+        }
+        ALEX = tmpAlex;
+        
+        MmdMotionPlayerGL2 tmpMp = null;
+        if (ALEX != null) {
+            tmpMp = new MmdMotionPlayerGL2();
+            try {
+                tmpMp.setPmd(ALEX);
+            } catch (MmdException e) {
+                SlashBlade.LOGGER.warn(e);
+            }
+        }
+        MOTION_PLAYER = tmpMp;
+    }
     
     int currentTick;
     
@@ -149,7 +154,6 @@ public class VanillaConvertedVmdAnimation {
         part.setRotation(rot.getX(), rot.getY(), rot.getZ());
     }
     
-    @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     public Vec3f get3DTransform(String boneName, TransformType type, Vec3f value0) {
         this.setupAnim();
         
@@ -162,12 +166,11 @@ public class VanillaConvertedVmdAnimation {
             blend.mul(0);
         }
         
-        if (!MOTION_PLAYER.isPresent()) {
+        if (MOTION_PLAYER == null) {
             return value0;
         }
-        MmdMotionPlayerGL2 mmp = MOTION_PLAYER.orElseThrow(() -> new IllegalStateException("No MOTION_PLAYER present"));
         
-        PmdBone bone = mmp.getBoneByName(boneName);
+        PmdBone bone = MOTION_PLAYER.getBoneByName(boneName);
         
         if (bone != null) {
             switch (type) {
@@ -193,7 +196,6 @@ public class VanillaConvertedVmdAnimation {
         return value0;
     }
     
-    @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     Vector3d quaternionToEulerZYX(Quaterniond qt) {
         Vector3d tmp = new Vector3d();
         Quaterniond normalizedQt = qt.normalize();
@@ -219,16 +221,14 @@ public class VanillaConvertedVmdAnimation {
     
     
     public void setupAnim() {
-        if (!MOTION_PLAYER.isPresent()) {
+        if (MOTION_PLAYER == null) {
             return;
         }
-        
-        MmdMotionPlayerGL2 mmp = MOTION_PLAYER.orElseThrow(() -> new IllegalStateException("MOTION_PLAYER is not present"));
         
         double eofTime = 0;
         MmdVmdMotionMc motion = BladeMotionManager.getInstance().getMotion(loc);
         try {
-            mmp.setVmd(motion);
+            MOTION_PLAYER.setVmd(motion);
             eofTime = TimeValueHelper.getMSecFromFrames(motion.getMaxFrame());
         } catch (Exception e) {
             MrqxSlashBladeCore.LOGGER.error("Failed to set up VMD Motion Animation", e);
@@ -239,7 +239,7 @@ public class VanillaConvertedVmdAnimation {
         time = TimeValueHelper.getMSecFromFrames((float) start) + time;
         
         try {
-            mmp.updateMotion((float) time);
+            MOTION_PLAYER.updateMotion((float) time);
         } catch (MmdException e) {
             MrqxSlashBladeCore.LOGGER.error("Failed to update VMD Motion Animation", e);
         }

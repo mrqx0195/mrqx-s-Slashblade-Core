@@ -1,6 +1,6 @@
 package net.mrqx.sbr_core.entity;
 
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -8,9 +8,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.extensions.IForgeEntity;
-import net.minecraftforge.entity.PartEntity;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
+import net.neoforged.neoforge.common.extensions.IEntityExtension;
+import net.neoforged.neoforge.entity.PartEntity;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public interface ISlashBladeEntity {
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     default List<Entity> processTargetList(Level world, LivingEntity attacker, AABB aabb, double reach, List<Entity> originalTargetList) {
         List<Entity> targetList = new ArrayList<>(originalTargetList);
-        targetList.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb.inflate(5), IForgeEntity::isMultipartEntity).stream()
+        targetList.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb.inflate(5), IEntityExtension::isMultipartEntity).stream()
             .flatMap(e -> (e.isMultipartEntity()) ? Stream.of(e.getParts()) : Stream.of(e)).filter(t -> {
                 boolean result = false;
                 if (t instanceof LivingEntity living) {
@@ -62,7 +62,7 @@ public interface ISlashBladeEntity {
         targetList.removeIf(entity -> this.getAttackableEntities().stream().noneMatch(clazz ->
             clazz.isInstance(entity)));
         
-        attacker.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        BladeStateAccess.of(attacker.getMainHandItem()).ifPresent(state -> {
             Entity target = state.getTargetEntity(world);
             if (target != null) {
                 targetList.add(target);
