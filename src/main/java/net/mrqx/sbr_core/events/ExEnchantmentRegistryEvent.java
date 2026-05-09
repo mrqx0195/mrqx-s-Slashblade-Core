@@ -1,27 +1,28 @@
 package net.mrqx.sbr_core.events;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExEnchantmentRegistryEvent extends Event implements IModBusEvent {
-    private final List<Enchantment> oldExEnchantments;
-    private final List<Enchantment> newExEnchantments = new ArrayList<>();
+    private final Set<ResourceKey<Enchantment>> oldExEnchantments;
+    private final Set<ResourceKey<Enchantment>> newExEnchantments = new HashSet<>();
     
-    public ExEnchantmentRegistryEvent(List<Enchantment> oldExEnchantment) {
-        this.oldExEnchantments = ImmutableList.copyOf(oldExEnchantment);
+    public ExEnchantmentRegistryEvent(Set<ResourceKey<Enchantment>> oldExEnchantment) {
+        this.oldExEnchantments = ImmutableSet.copyOf(oldExEnchantment);
         this.newExEnchantments.addAll(oldExEnchantment);
     }
     
-    public List<Enchantment> getOldExEnchantments() {
+    public Set<ResourceKey<Enchantment>> getOldExEnchantments() {
         return oldExEnchantments;
     }
     
-    public List<Enchantment> getNewExEnchantments() {
+    public Set<ResourceKey<Enchantment>> getNewExEnchantments() {
         return newExEnchantments;
     }
 }

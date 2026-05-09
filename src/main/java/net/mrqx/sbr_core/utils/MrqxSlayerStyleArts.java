@@ -273,7 +273,7 @@ public class MrqxSlayerStyleArts {
         }
         AttributeInstance stepHeightAttribute = livingEntity.getAttribute(Attributes.STEP_HEIGHT);
         if (stepHeightAttribute != null) {
-            AttributeModifier stepUpBonus = new AttributeModifier(MrqxSlashBladeCore.prefix("stepUp_bonus"), 0.5, AttributeModifier.Operation.ADD_VALUE);
+            AttributeModifier stepUpBonus = new AttributeModifier(MrqxSlashBladeCore.prefix("step_up_bonus"), 0.5, AttributeModifier.Operation.ADD_VALUE);
             stepHeightAttribute.removeModifier(stepUpBonus);
             if (doStepUpBoost && (BladeStateAccess.of(livingEntity.getMainHandItem()).isPresent())) {
                 stepHeightAttribute.addPermanentModifier(stepUpBonus);

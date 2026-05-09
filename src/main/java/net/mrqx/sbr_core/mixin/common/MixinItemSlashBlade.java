@@ -1,6 +1,7 @@
 package net.mrqx.sbr_core.mixin.common;
 
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.mrqx.sbr_core.events.ExEnchantmentRegistryEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -12,14 +13,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
+import java.util.Set;
 
 @Mixin(ItemSlashBlade.class)
 public abstract class MixinItemSlashBlade {
     @Shadow(remap = false)
     @Final
     @Mutable
-    public static List<Enchantment> EX_ENCHANTMENTS;
+    public static Set<ResourceKey<Enchantment>> EX_ENCHANTMENTS;
     
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void injectClinit(CallbackInfo ci) {
