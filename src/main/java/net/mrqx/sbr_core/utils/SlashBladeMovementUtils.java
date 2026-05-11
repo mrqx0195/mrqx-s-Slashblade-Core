@@ -8,6 +8,12 @@ import net.minecraft.world.entity.LivingEntity;
 
 import javax.annotation.Nullable;
 
+/**
+ * 拔刀剑瞬步/移动辅助工具集。
+ * <p>
+ * 提供隔空瞬步（Air Trick）、瞬步退行（Trick Down）、闪避（Trick Dodge）
+ * 及追踪目标瞬移等移动类能力的判定与执行。
+ */
 @SuppressWarnings("unused")
 public class SlashBladeMovementUtils {
     public static final String TRICK_COOL_DOWN = "sbr_core.trickCooldown";
@@ -93,6 +99,9 @@ public class SlashBladeMovementUtils {
         }
     }
     
+    /**
+     * 主 Tick 调度：根据实体状态和设置，依次尝试隔空瞬步、退行、闪避等移动技能，并管理冷却。
+     */
     public static void tickSlashBladeTrick(LivingEntity livingEntity, Entity target,
                                            boolean canAirTrick, boolean canTrickDown, boolean canTrickDodge, boolean powerful) {
         float distance = livingEntity.distanceTo(target);

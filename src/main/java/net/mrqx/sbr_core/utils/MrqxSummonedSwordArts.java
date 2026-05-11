@@ -16,6 +16,13 @@ import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
 
+/**
+ * 自定义的幻影剑技系统。
+ * <p>
+ * 提供基础幻影剑（{@link #BASE_SUMMONED_SWORD}）、螺旋幻剑（{@link #SPIRAL_SWORD}）、
+ * 怒风幻剑（{@link #STORM_SWORD}）、急袭幻剑（{@link #BLISTERING_SWORD}）以及暴雨幻剑（{@link #HEAVY_RAIN_SWORD}）的实现。
+ * 各剑技的创建与发射逻辑均在此集中定义。
+ */
 public class MrqxSummonedSwordArts {
     public static final TriConsumer<LivingEntity, LivingEntity, Double> BASE_SUMMONED_SWORD = (livingEntity, target, damage) -> {
         AdvancementHelper.grantCriterion(livingEntity, SummonedSwordArts.ADVANCEMENT_SUMMONEDSWORDS);
@@ -138,6 +145,9 @@ public class MrqxSummonedSwordArts {
             HEAVY_RAIN_SWORD_POS.accept(livingEntity, targetPos, damage, count);
         });
     
+    /**
+     * 根据俯仰角与偏转角计算视角方向向量。
+     */
     public static Vec3 calculateViewVector(float x, float y) {
         float f = x * ((float) Math.PI / 180F);
         float f1 = -y * ((float) Math.PI / 180F);

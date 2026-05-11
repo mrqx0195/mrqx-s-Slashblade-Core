@@ -36,6 +36,13 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+/**
+ * 自定义的拔刀剑移动/战斗风格动作系统。
+ * <p>
+ * 提供瞬步上行（Trick Up）、隔空瞬步（Air Trick）、瞬步退行（Trick Down）、
+ * 瞬步回避（Trick Dodge）等动作的实现，并在常驻 Tick 中处理
+ * 实体移动属性增强及瞬步相关计数器更新。
+ */
 @SuppressWarnings("unused")
 @EventBusSubscriber
 public class MrqxSlayerStyleArts {
@@ -158,6 +165,9 @@ public class MrqxSlayerStyleArts {
             return false;
         }).orElse(false);
     
+    /**
+     * 执行隔空瞬步传送逻辑：标记实体并在服务端发送运动同步包。
+     */
     public static void doAirTrickTeleport(Entity entityIn, LivingEntity target) {
         entityIn.getPersistentData().putInt(AIR_TRICK_COUNTER_KEY, 3);
         entityIn.getPersistentData().putInt(AIR_TRICK_TARGET_KEY, target.getId());
@@ -169,6 +179,9 @@ public class MrqxSlayerStyleArts {
         }
     }
     
+    /**
+     * 执行实际的实体传送：计算目标位置并处理不同实体类型（玩家/非玩家）的传送逻辑。
+     */
     private static void executeTeleport(LivingEntity entityIn, LivingEntity target) {
         if (!(entityIn.level() instanceof ServerLevel worldIn)) {
             return;
@@ -238,6 +251,13 @@ public class MrqxSlayerStyleArts {
         }
     }
     
+    /**
+     * 常驻 Tick 处理：
+     * <ul>
+     *   <li>控制非玩家持有拔刀剑实体的移动属性增强（跨步高度加成）</li>
+     *   <li>更新瞬步上行、回避、隔空瞬步等计数器</li>
+     * </ul>
+     */
     @SuppressWarnings("deprecation")
     @SubscribeEvent
     public static void onLivingTickEvent(EntityTickEvent.Post event) {

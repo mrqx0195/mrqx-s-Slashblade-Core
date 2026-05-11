@@ -10,10 +10,19 @@ import net.mrqx.sbr_core.events.ComboStateRegistryEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 
+/**
+ * 连段修改事件处理器。
+ * <p>
+ * 监听 {@link ComboStateRegistryEvent}，为特定的连段添加自定义 Tick 动作，
+ * 例如为上斩添加跃升斩过渡逻辑。
+ */
 @EventBusSubscriber
 public class ComboModifyHandler {
     private static final ResourceLocation UPPER_SLASH_NAME = SlashBlade.prefix("upperslash_jump");
     
+    /**
+     * 在连段状态注册时，为上斩（Upper Slash）添加跃升斩（Upper Slash Jump）的过渡 Tick 动作。
+     */
     @SubscribeEvent
     public static void onComboStateRegistryEvent(ComboStateRegistryEvent event) {
         ComboState.Builder builder = event.getBuilder();

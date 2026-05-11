@@ -26,6 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.mrqx.sbr_core.MrqxSlashBladeCore;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import org.joml.Matrix4f;
@@ -34,23 +35,35 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Optional;
 
+/**
+ * 支持 MMD 骨骼驱动的拔刀剑渲染层。
+ * <p>
+ * 重写了原版的 {@link LayerMainBlade}，使用 MMD 骨骼动画（VMD）
+ * 渲染刀与鞘，并支持充能特效显示。
+ */
 public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel<T>> extends LayerMainBlade<T, M> {
     @Nullable
     private MmdPmdModelMc cachedBladeholder;
     @Nullable
     private MmdMotionPlayerGL2 cachedMotionPlayer;
     
+    /**
+     * 获取或创建刀挂（bladeholder）的 PMD 模型。
+     */
     public Optional<MmdPmdModelMc> getBladeholder() {
         if (cachedBladeholder == null) {
             try {
                 cachedBladeholder = new MmdPmdModelMc(ResourceLocation.fromNamespaceAndPath(SlashBlade.MODID, "model/bladeholder.pmd"));
             } catch (IOException | MmdException e) {
-                SlashBlade.LOGGER.warn(e);
+                MrqxSlashBladeCore.LOGGER.warn("Failed to new jp.nyatla.nymmd.MmdPmdModelMc", e);
             }
         }
         return Optional.ofNullable(cachedBladeholder);
     }
     
+    /**
+     * 获取或创建 MMD 动作播放器，并绑定刀挂模型。
+     */
     public Optional<MmdMotionPlayerGL2> getMotionPlayer() {
         if (cachedMotionPlayer == null) {
             cachedMotionPlayer = new MmdMotionPlayerGL2();
@@ -58,17 +71,23 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
                 try {
                     cachedMotionPlayer.setPmd(bladeHolder);
                 } catch (MmdException e) {
-                    SlashBlade.LOGGER.warn(e);
+                    MrqxSlashBladeCore.LOGGER.warn("Failed to setPmd for MotionPlayer", e);
                 }
             });
         }
         return Optional.ofNullable(cachedMotionPlayer);
     }
     
+    /**
+     * @param entityRendererIn 父渲染器
+     */
     public LayerSlashEntityBlade(RenderLayerParent<T, M> entityRendererIn) {
         super(entityRendererIn);
     }
     
+    /**
+     * 渲染主方法：渲染副手物品，计算当前连段的动画帧并驱动 MMD 骨骼模型渲染刀与鞘。
+     */
     @Override
     public void render(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         this.renderOffhandItem(matrixStack, bufferIn, lightIn, entity);
@@ -104,7 +123,7 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
                         maxSeconds = TimeValueHelper.getMSecFromFrames(motion.getMaxFrame());
                     }
                 } catch (Exception e) {
-                    SlashBlade.LOGGER.warn(e);
+                    MrqxSlashBladeCore.LOGGER.warn("Error while rendering LayerSlashEntityBlade", e);
                 }
                 
                 double start = 0.0;
@@ -129,7 +148,7 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
                 try {
                     mmp.updateMotion((float) time);
                 } catch (MmdException e) {
-                    SlashBlade.LOGGER.warn(e);
+                    MrqxSlashBladeCore.LOGGER.warn("Error while rendering LayerSlashEntityBlade", e);
                 }
                 
                 try (MSAutoCloser ignored = MSAutoCloser.pushMatrix(matrixStack)) {
@@ -165,6 +184,9 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
         }
     }
     
+    /**
+     * 渲染 MMD 骨骼的指定部件（刀/鞘/特效）。
+     */
     private void renderPart(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, double motionScale, double modelScaleBase, ItemStack stack, MmdMotionPlayerGL2 mmp, ResourceLocation textureLocation, WavefrontObject obj, int idx, String part) {
         if (0 <= idx) {
             float[] buf = new float[16];
@@ -183,6 +205,9 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
         BladeRenderState.renderOverridedLuminous(stack, obj, part + "_luminous", textureLocation, matrixStack, bufferIn, lightIn);
     }
     
+    /**
+     * 设置用户的姿态：如果存在 VMD 动画，则更新其帧插值。
+     */
     @Override
     public void setUserPose(PoseStack matrixStack, T entity, float partialTicks) {
         if (entity instanceof ISlashBladeEntity slashBladeEntity) {

@@ -13,6 +13,13 @@ import net.mrqx.sbr_core.utils.MrqxSummonedSwordArts;
 
 import javax.annotation.Nullable;
 
+/**
+ * 远程幻影剑攻击 AI 目标。
+ * <p>
+ * 允许持有拔刀剑的 {@link PathfinderMob} 周期性地向目标发射基础幻影剑、
+ * 螺旋幻剑阵、怒风幻剑阵、急袭幻剑阵、暴雨幻剑阵等远程剑技。
+ * 各剑技独立冷却，由子类可重写的方法提供冷却时间与剑数量参数。
+ */
 public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity & RangedAttackMob> extends RangedAttackGoal {
     public final T entity;
     protected boolean canUseBaseSummonedSword;
@@ -28,6 +35,13 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
     @Nullable
     public LivingEntity target;
     
+    /**
+     * @param canUseBaseSummonedSword 是否启用基础幻影剑
+     * @param canUseSpiralSword       是否启用环形幻剑阵
+     * @param canUseStormSword        是否启用怒风幻剑阵
+     * @param canUseBlisteringSword   是否启用急袭幻剑阵
+     * @param canUseHeavyRainSword    是否启用暴雨幻剑阵
+     */
     public SimpleMirageBladeGoal(T rangedAttackMob, double speedModifier,
                                  boolean canUseBaseSummonedSword, boolean canUseSpiralSword, boolean canUseStormSword,
                                  boolean canUseBlisteringSword, boolean canUseHeavyRainSword) {
@@ -40,11 +54,17 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
         this.canUseHeavyRainSword = canUseHeavyRainSword;
     }
     
+    /**
+     * 此目标不可被打断。
+     */
     @Override
     public boolean isInterruptable() {
         return false;
     }
     
+    /**
+     * 当实体存在有效目标时可启用。
+     */
     @Override
     public boolean canUse() {
         LivingEntity livingentity = this.entity.getTarget();
@@ -56,11 +76,17 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
         }
     }
     
+    /**
+     * 只要目标仍然有效则继续运行。
+     */
     @Override
     public boolean canContinueToUse() {
         return this.canUse() || (this.target != null && this.target.isAlive());
     }
     
+    /**
+     * 每个 tick 递减各剑技冷却计数器，并在冷却归零时按配置发射对应剑技。
+     */
     @Override
     public void tick() {
         baseSummonedSwordCounter--;
@@ -106,45 +132,75 @@ public class SimpleMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity &
         }
     }
     
+    /**
+     * 获取当前主手武器上的力量（Power）附魔等级，用于计算幻影剑伤害。
+     */
     public double getPowerLevel() {
         return this.entity.getMainHandItem().getEnchantmentLevel(this.entity.level().registryAccess().holderOrThrow(Enchantments.POWER));
     }
     
+    /**
+     * 基础幻影剑的发射冷却（单位：tick，默认 20）。
+     */
     public int getBaseSummonedSwordCooldown() {
         return 20;
     }
     
+    /**
+     * 环形幻剑阵的发射冷却（默认 200）。
+     */
     public int getSpiralSwordCooldown() {
         return 200;
     }
     
+    /**
+     * 怒风幻剑阵的发射冷却（默认 200）。
+     */
     public int getStormSwordCooldown() {
         return 200;
     }
     
+    /**
+     * 急袭幻剑阵的发射冷却（默认 400）。
+     */
     public int getBlisteringSwordCooldown() {
         return 400;
     }
     
+    /**
+     * 暴雨幻剑阵的发射冷却（默认 600）。
+     */
     public int getHeavyRainSwordCooldown() {
         return 600;
     }
     
+    /**
+     * 环形幻剑阵的生成数量（S 级及以上评价为 8，否则 6）。
+     */
     public int getSpiralSwordCount() {
         return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getData(CapabilityConcentrationRank.RANK_POINT)
             .getRank(this.entity.level().getGameTime()).level ? 8 : 6;
     }
     
+    /**
+     * 怒风幻剑阵的生成数量（S 级及以上评价为 8，否则 6）。
+     */
     public int getStormSwordCount() {
         return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getData(CapabilityConcentrationRank.RANK_POINT)
             .getRank(this.entity.level().getGameTime()).level ? 8 : 6;
     }
     
+    /**
+     * 急袭幻剑阵的生成数量（S 级及以上评价为 8，否则 6）。
+     */
     public int getBlisteringSwordCount() {
         return IConcentrationRank.ConcentrationRanks.S.level <= this.entity.getData(CapabilityConcentrationRank.RANK_POINT)
             .getRank(this.entity.level().getGameTime()).level ? 8 : 6;
     }
     
+    /**
+     * 暴雨幻剑阵的生成数量，基于等级评价计算。
+     */
     public int getHeavyRainSwordCount() {
         return (9 + Math.min(this.entity.getData(CapabilityConcentrationRank.RANK_POINT)
             .getRank(this.entity.level().getGameTime()).level - 1, 0)) * 2;

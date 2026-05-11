@@ -7,15 +7,20 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.phys.AABB;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.mixin.common.AccessorMeleeAttackGoal;
-import net.mrqx.sbr_core.mixin.common.AccessorMob;
 import net.mrqx.sbr_core.utils.SlashBladeAttackUtils;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
+/**
+ * 近战拔刀剑攻击 AI 目标。
+ * <p>
+ * 允许持有拔刀剑的 {@link PathfinderMob} 使用完整的拔刀剑连段系统进行攻击，
+ * 支持地面连段、空中连段、迅冲斩、虚无刀界、剑技触发等操作。
+ * 可由子类通过构造参数配置是否启用快速连段、空中优先、剑技等特性。
+ */
 public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extends MeleeAttackGoal {
     protected final T entity;
     protected final int attackCooldown;
@@ -30,6 +35,9 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
     @Nullable
     private Consumer<SimpleSlashGoal<T>> afterSlashConsumer = null;
     
+    /**
+     * 简化构造器，所有高级特性默认关闭。
+     */
     public SimpleSlashGoal(T mob, double speedModifier, int attackCooldown, boolean followingTargetEvenIfNotSeen) {
         super(mob, speedModifier, followingTargetEvenIfNotSeen);
         this.entity = mob;
@@ -42,6 +50,14 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
         this.powerful = false;
     }
     
+    /**
+     * @param canRapidSlash      是否启用迅冲斩
+     * @param preferAirAttack    是否优先空中攻击（如跃升斩）
+     * @param canVoidSlash       是否启用虚无刀界作为起手
+     * @param canDoSlashArts     是否允许触发剑技
+     * @param canDoJustSlashArts 是否允许使用 Just 剑技（如完美次元斩）
+     * @param powerful           是否为强力版本（影响连段打断判定和瞬步冷却）
+     */
     public SimpleSlashGoal(T mob, double speedModifier, int attackCooldown, boolean followingTargetEvenIfNotSeen,
                            boolean canRapidSlash, boolean preferAirAttack, boolean canVoidSlash,
                            boolean canDoSlashArts, boolean canDoJustSlashArts, boolean powerful) {
@@ -56,9 +72,12 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
         this.powerful = powerful;
     }
     
+    /**
+     * 在攻击范围内时执行一次拔刀剑攻击，推进连段并重置冷却。
+     */
     @Override
     protected void checkAndPerformAttack(LivingEntity enemy) {
-        if (this.getAttackBoundingBox().intersects(enemy.getHitbox()) && this.getTicksUntilNextAttack() <= 0) {
+        if (this.entity.isWithinMeleeAttackRange(enemy) && this.getTicksUntilNextAttack() <= 0) {
             this.entity.swing(InteractionHand.MAIN_HAND);
             this.doSlashBladeAttack(enemy);
             BladeStateAccess.of(this.entity.getMainHandItem()).ifPresent(state ->
@@ -73,13 +92,9 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
         }
     }
     
-    public AABB getAttackBoundingBox() {
-        AABB attackBoundingBox = ((AccessorMob) this.entity).sbr_core$getAttackBoundingBox();
-        return this.canRapidSlash
-            ? attackBoundingBox.inflate(attackBoundingBox.getXsize() * 2, attackBoundingBox.getYsize() * 2, attackBoundingBox.getZsize() * 2)
-            : attackBoundingBox;
-    }
-    
+    /**
+     * 执行拔刀剑攻击的分发逻辑，根据距离、位置与配置选择连段/剑技。
+     */
     protected void doSlashBladeAttack(LivingEntity target) {
         BladeStateAccess.of(this.entity.getMainHandItem()).ifPresent(state -> {
             state.setTargetEntityId(this.entity.getTarget());
@@ -108,26 +123,41 @@ public class SimpleSlashGoal<T extends PathfinderMob & ISlashBladeEntity> extend
         super.resetAttackCooldown();
     }
     
+    /**
+     * 只有在主手持拔刀剑时才启用此目标。
+     */
     @Override
     public boolean canUse() {
         return super.canUse() && SlashBladeAttackUtils.isHoldingSlashBlade(mob);
     }
     
+    /**
+     * 获取攻击后回调消费者。
+     */
     @Nullable
     public Consumer<SimpleSlashGoal<T>> getAfterSlashConsumer() {
         return afterSlashConsumer;
     }
     
+    /**
+     * 设置攻击后回调消费者，可用于链式调用。
+     */
     public SimpleSlashGoal<T> setAfterSlashConsumer(@Nullable Consumer<SimpleSlashGoal<T>> afterSlashConsumer) {
         this.afterSlashConsumer = afterSlashConsumer;
         return this;
     }
     
+    /**
+     * 获取上一次攻击后的连段状态 ID。
+     */
     @Nullable
     public ResourceLocation getLastComboStateLocation() {
         return lastComboStateLocation;
     }
     
+    /**
+     * 记录上一次攻击后的连段状态 ID。
+     */
     protected void setLastComboStateLocation(ResourceLocation lastComboStateLocation) {
         this.lastComboStateLocation = lastComboStateLocation;
     }

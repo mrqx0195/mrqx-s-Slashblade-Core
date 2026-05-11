@@ -16,15 +16,27 @@ import net.mrqx.sbr_core.client.ClientAnimations;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+/**
+ * 持刀实体同步数据包。
+ * <p>
+ * 从服务端发送至客户端，携带实体的评价点数与当前连段信息，
+ * 用于客户端播放对应的 VMD 动画。
+ */
 public record SlashEntitySyncMessage(long rawPoint, int entityId, String combo) implements CustomPacketPayload {
     public static final Type<SlashEntitySyncMessage> TYPE = new Type<>(MrqxSlashBladeCore.prefix("slash_entity_sync"));
     public static final StreamCodec<RegistryFriendlyByteBuf, SlashEntitySyncMessage> STREAM_CODEC = CustomPacketPayload
         .codec(SlashEntitySyncMessage::write, SlashEntitySyncMessage::new);
     
+    /**
+     * 从网络缓冲区反序列化。
+     */
     private SlashEntitySyncMessage(RegistryFriendlyByteBuf buf) {
         this(buf.readLong(), buf.readInt(), buf.readUtf());
     }
     
+    /**
+     * 序列化至网络缓冲区。
+     */
     private void write(RegistryFriendlyByteBuf buf) {
         buf.writeLong(this.rawPoint);
         buf.writeInt(this.entityId);
@@ -36,6 +48,9 @@ public record SlashEntitySyncMessage(long rawPoint, int entityId, String combo) 
         return TYPE;
     }
     
+    /**
+     * 客户端收到数据包后：更新评价点数，查找并播放对应的 VMD 动画。
+     */
     public static void handle(SlashEntitySyncMessage msg, IPayloadContext ctx) {
         if (Minecraft.getInstance().level != null) {
             Entity entity = Minecraft.getInstance().level.getEntity(msg.entityId);
