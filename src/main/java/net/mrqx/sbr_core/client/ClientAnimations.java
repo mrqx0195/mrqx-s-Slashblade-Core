@@ -10,10 +10,19 @@ import net.mrqx.sbr_core.mixin.common.AccessorVmdAnimation;
 
 import java.util.Map;
 
+/**
+ * 客户端动画存储类。
+ * <p>
+ * 在初始化时从 {@link PlayerAnimationOverrider} 中读取所有 VMD 动画，
+ * 转换为 {@link VanillaConvertedVmdAnimation} 存储以供查询。
+ */
 @OnlyIn(Dist.CLIENT)
 public class ClientAnimations {
     public static final Map<ResourceLocation, VanillaConvertedVmdAnimation> ANIMATION = initAnimations();
     
+    /**
+     * 初始化动画映射表：遍历已注册的动画并转换为 VanillaConvertedVmdAnimation。
+     */
     private static Map<ResourceLocation, VanillaConvertedVmdAnimation> initAnimations() {
         Map<ResourceLocation, VanillaConvertedVmdAnimation> map = Maps.newHashMap();
         PlayerAnimationOverrider.getInstance().getAnimation().forEach((resourceLocation, vmdAnimation) -> {

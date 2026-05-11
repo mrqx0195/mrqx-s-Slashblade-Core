@@ -12,6 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * SBR Core 的通用配置类。
+ * <p>
+ * 提供对拔刀剑可获取附魔列表的黑名单配置，
+ * 在配置加载时自动从 {@link ItemSlashBlade#exEnchantment} 中移除被禁用的附魔。
+ */
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class MrqxSlashBladeCoreConfig {
     public static final ForgeConfigSpec COMMON_CONFIG;
@@ -27,6 +33,9 @@ public class MrqxSlashBladeCoreConfig {
         COMMON_CONFIG = commonBuilder.build();
     }
     
+    /**
+     * 配置加载时，从 {@link ItemSlashBlade#exEnchantment} 中移除黑名单附魔。
+     */
     @SubscribeEvent
     public static void onLoad(ModConfigEvent.Loading event) {
         ItemSlashBlade.exEnchantment.removeIf(enchantment -> {

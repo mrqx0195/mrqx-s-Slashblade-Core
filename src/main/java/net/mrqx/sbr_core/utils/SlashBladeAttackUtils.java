@@ -30,14 +30,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * 拔刀剑攻击工具集。
+ * <p>
+ * 提供连段判断、攻击类型分发（地面/空中）、蓄力斩判定、终结技触发等核心战斗逻辑。
+ * 通过 {@link ComboState} 状态机构管理连段推进与打断规则。
+ */
 public class SlashBladeAttackUtils {
     public static final String VOID_SLASH_COUNTER_KEY = "sbr_core.voidSlashCounter";
     public static final String SUPER_JUDGEMENT_CUT_COUNTER_KEY = "sbr_core.superJudgementCutCounter";
     
+    /**
+     * 判断实体主手是否持有拔刀剑。
+     */
     public static boolean isHoldingSlashBlade(LivingEntity livingEntity) {
         return !livingEntity.getMainHandItem().isEmpty() && livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).isPresent();
     }
     
+    /**
+     * 判断当前连段是否允许被打断以执行其他动作。
+     */
     public static boolean canInterruptCombo(LivingEntity livingEntity, boolean powerful) {
         return livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(state -> {
             ResourceLocation currentLoc = state.resolvCurrentComboState(livingEntity);
@@ -53,6 +65,9 @@ public class SlashBladeAttackUtils {
         }).orElse(false);
     }
     
+    /**
+     * 尝试使用空中下劈斩（Aerial Cleave）。
+     */
     public static void tryAerialCleave(LivingEntity livingEntity, ISlashBladeState state) {
         if (livingEntity.onGround()) {
             return;
@@ -60,6 +75,9 @@ public class SlashBladeAttackUtils {
         state.updateComboSeq(livingEntity, ComboStateRegistry.AERIAL_CLEAVE.getId());
     }
     
+    /**
+     * 地面攻击：根据是否在地面进入连段 A 或空中下劈斩。
+     */
     public static void groundAttack(LivingEntity livingEntity, ISlashBladeState state) {
         if (livingEntity.onGround()) {
             state.updateComboSeq(livingEntity, ComboStateRegistry.COMBO_A1.getId());
@@ -68,6 +86,9 @@ public class SlashBladeAttackUtils {
         }
     }
     
+    /**
+     * 空中攻击：根据是否在地面、是否允许迅冲斩来分发连段。
+     */
     public static void airAttack(LivingEntity livingEntity, ISlashBladeState state, boolean canRapidSlash) {
         if (!state.resolvCurrentComboState(livingEntity).equals(ComboStateRegistry.UPPERSLASH.getId())) {
             if (livingEntity.onGround()) {
@@ -82,6 +103,9 @@ public class SlashBladeAttackUtils {
         }
     }
     
+    /**
+     * 迅冲斩攻击：面向目标并切换至迅冲斩连段。
+     */
     public static void rapidSlashAttack(LivingEntity livingEntity, ISlashBladeState state, LivingEntity target) {
         ResourceLocation currentLoc = state.resolvCurrentComboState(livingEntity);
         ComboState current = ComboStateRegistry.REGISTRY.get().getValue(currentLoc);
@@ -96,6 +120,9 @@ public class SlashBladeAttackUtils {
         }
     }
     
+    /**
+     * 执行剑技（SlashArts），根据是否 Just 判定使用不同蓄力时间与类型。
+     */
     public static boolean doSlashArts(LivingEntity livingEntity, ISlashBladeState state, LivingEntity target, boolean isJust) {
         livingEntity.lookAt(EntityAnchorArgument.Anchor.FEET, target.position());
         int elapsed;
@@ -121,6 +148,9 @@ public class SlashBladeAttackUtils {
         return false;
     }
     
+    /**
+     * 尝试触发剑技。根据当前连段判定是否允许蓄力斩击，并区分普通/高级/快速蓄力组合。
+     */
     public static boolean trySlashArts(LivingEntity livingEntity, ISlashBladeState state, LivingEntity target, boolean isJust, boolean powerful) {
         if (JustSlashArtManager.getJustCooldown(livingEntity) > 0) {
             return false;
@@ -142,6 +172,9 @@ public class SlashBladeAttackUtils {
         return false;
     }
     
+    /**
+     * 发动虚无刀界（Void Slash）：若为强力版本则先瞬移至目标附近。
+     */
     public static void voidSlash(LivingEntity livingEntity, ISlashBladeState state, LivingEntity target, boolean powerful) {
         if (powerful) {
             SlashBladeMovementUtils.tryTrickToTarget(livingEntity, target);
@@ -149,6 +182,9 @@ public class SlashBladeAttackUtils {
         state.updateComboSeq(livingEntity, ComboStateRegistry.VOID_SLASH.getId());
     }
     
+    /**
+     * 普通拔刀剑攻击的主分发逻辑。根据当前连段状态、位置、设置等信息选择具体的攻击方式。
+     */
     public static void normalSlashBladeAttack(LivingEntity livingEntity, ISlashBladeState state, LivingEntity target,
                                               boolean canRapidSlash, boolean preferAirAttack, boolean canVoidSlash, boolean powerful) {
         ResourceLocation currentLoc = state.resolvCurrentComboState(livingEntity);

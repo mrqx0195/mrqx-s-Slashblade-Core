@@ -12,12 +12,20 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.client.model.ISlashBladeEntityModel;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 
+/**
+ * 支持身体旋转姿态的盔甲渲染层。
+ * <p>
+ * 在渲染盔甲时应用实体的身体旋转姿态，使盔甲与拔刀剑动画同步。
+ */
 @OnlyIn(Dist.CLIENT)
 public class LayerSlashEntityArmor<T extends LivingEntity & ISlashBladeEntity, M extends HumanoidModel<T> & ISlashBladeEntityModel, A extends HumanoidModel<T> & ISlashBladeEntityModel> extends HumanoidArmorLayer<T, M, A> {
     public LayerSlashEntityArmor(RenderLayerParent<T, M> renderer, A innerModel, A outerModel, ModelManager modelManager) {
         super(renderer, innerModel, outerModel, modelManager);
     }
     
+    /**
+     * 渲染时推入矩阵并应用身体旋转姿态。
+     */
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         poseStack.pushPose();

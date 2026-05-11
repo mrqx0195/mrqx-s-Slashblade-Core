@@ -37,8 +37,17 @@ import org.joml.Matrix4f;
 
 import java.io.IOException;
 
+/**
+ * 支持 MMD 骨骼驱动的拔刀剑渲染层。
+ * <p>
+ * 重写了原版的 {@link LayerMainBlade}，使用 MMD 骨骼动画（VMD）
+ * 渲染刀与鞘，并支持充能特效显示。
+ */
 @OnlyIn(Dist.CLIENT)
 public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel<T>> extends LayerMainBlade<T, M> {
+    /**
+     * 获取或创建刀挂（bladeholder）的 PMD 模型。
+     */
     protected final LazyOptional<MmdPmdModelMc> bladeHolder = LazyOptional.of(() -> {
         try {
             return new MmdPmdModelMc(SlashBlade.prefix("model/bladeholder.pmd"));
@@ -46,6 +55,9 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
             throw new RuntimeException("Failed to load blade model!", e);
         }
     });
+    /**
+     * 获取或创建 MMD 动作播放器，并绑定刀挂模型。
+     */
     protected final LazyOptional<MmdMotionPlayerGL2> motionPlayer = LazyOptional.of(() -> {
         MmdMotionPlayerGL2 mmp = new MmdMotionPlayerGL2();
         this.bladeHolder.ifPresent((pmd) -> {
@@ -58,10 +70,16 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
         return mmp;
     });
     
+    /**
+     * @param entityRendererIn 父渲染器
+     */
     public LayerSlashEntityBlade(RenderLayerParent<T, M> entityRendererIn) {
         super(entityRendererIn);
     }
     
+    /**
+     * 渲染主方法：渲染副手物品，计算当前连段的动画帧并驱动 MMD 骨骼模型渲染刀与鞘。
+     */
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     @Override
     public void render(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
@@ -160,6 +178,9 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
         }
     }
     
+    /**
+     * 渲染 MMD 骨骼的指定部件（刀/鞘/特效）。
+     */
     private void renderPart(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, double motionScale, double modelScaleBase, ItemStack stack, MmdMotionPlayerGL2 mmp, ResourceLocation textureLocation, WavefrontObject obj, int idx, String part) {
         if (0 <= idx) {
             float[] buf = new float[16];
@@ -178,6 +199,9 @@ public class LayerSlashEntityBlade<T extends LivingEntity, M extends EntityModel
         BladeRenderState.renderOverridedLuminous(stack, obj, part + "_luminous", textureLocation, matrixStack, bufferIn, lightIn);
     }
     
+    /**
+     * 设置用户的姿态：如果存在 VMD 动画，则更新其帧插值。
+     */
     @Override
     public void setUserPose(PoseStack matrixStack, T entity, float partialTicks) {
         if (entity instanceof ISlashBladeEntity slashBladeEntity) {

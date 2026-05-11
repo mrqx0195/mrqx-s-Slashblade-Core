@@ -9,8 +9,17 @@ import net.mrqx.sbr_core.utils.InputStream;
 
 import java.util.EnumSet;
 
+/**
+ * 按键输入事件处理器。
+ * <p>
+ * 监听 {@link InputCommandEvent}，将按键按下/弹起状态转换记录到 {@link InputStream} 中，
+ * 供连段搓招系统查询历史输入。
+ */
 @Mod.EventBusSubscriber
 public class InputCommandEventHandler {
+    /**
+     * 以最高优先级处理输入事件，将按键状态变更记录到输入流中。
+     */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onInputCommandEvent(InputCommandEvent event) {
         InputStream inputStream = InputStream.getOrCreateInputStream(event.getEntity());

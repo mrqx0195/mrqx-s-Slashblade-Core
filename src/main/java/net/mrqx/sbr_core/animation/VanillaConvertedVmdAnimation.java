@@ -34,6 +34,9 @@ import java.util.List;
  * @author baguchi
  */
 public class VanillaConvertedVmdAnimation {
+    /**
+     * 默认的 Alex 模型 PMD 实例。
+     */
     static final LazyOptional<MmdPmdModelMc> ALEX =
         LazyOptional.of(() -> {
             try {
@@ -43,6 +46,9 @@ public class VanillaConvertedVmdAnimation {
             }
         });
     
+    /**
+     * 全局 MMD 动作播放器。
+     */
     static final LazyOptional<MmdMotionPlayerGL2> MOTION_PLAYER =
         LazyOptional.of(() -> {
             MmdMotionPlayerGL2 mmp = new MmdMotionPlayerGL2();
@@ -75,6 +81,12 @@ public class VanillaConvertedVmdAnimation {
     static final List<String> LEGS = Lists.newArrayList("left leg", "right leg");
     
     
+    /**
+     * @param loc   动画资源路径
+     * @param start 起始帧（ms）
+     * @param end   结束帧（ms）
+     * @param loop  是否循环
+     */
     public VanillaConvertedVmdAnimation(ResourceLocation loc, double start, double end, boolean loop) {
         this.loc = loc;
         this.start = start;
@@ -87,6 +99,9 @@ public class VanillaConvertedVmdAnimation {
         currentTick = 0;
     }
     
+    /**
+     * 克隆当前动画（每个实体实例应有独立的动画状态）。
+     */
     public VanillaConvertedVmdAnimation getClone() {
         VanillaConvertedVmdAnimation tmp = new VanillaConvertedVmdAnimation(this.loc, this.start, this.end, this.loop);
         
@@ -95,21 +110,33 @@ public class VanillaConvertedVmdAnimation {
         return tmp;
     }
     
+    /**
+     * 设置帧插值并更新动画状态。
+     */
     public void setTickDelta(float tickDelta) {
         this.tickDelta = tickDelta;
         this.setupAnim();
     }
     
+    /**
+     * 设置是否混合手臂（不覆盖手臂动画）。
+     */
     public VanillaConvertedVmdAnimation setBlendArms(boolean blend) {
         blendArms = blend;
         return this;
     }
     
+    /**
+     * 设置是否混合腿部（不覆盖腿部动画）。
+     */
     public VanillaConvertedVmdAnimation setBlendLegs(boolean blend) {
         blendLegs = blend;
         return this;
     }
     
+    /**
+     * 推进一帧，并在动画播放完毕后停止。
+     */
     public void tick() {
         if (this.isRunning) {
             this.currentTick++;
@@ -120,23 +147,38 @@ public class VanillaConvertedVmdAnimation {
         }
     }
     
+    /**
+     * 从头开始播放动画。
+     */
     public void play() {
         this.currentTick = 0;
         this.isRunning = true;
     }
     
+    /**
+     * 停止播放动画。
+     */
     public void stop() {
         this.isRunning = false;
     }
     
+    /**
+     * 获取当前播放进度（tick）。
+     */
     public int getCurrentTick() {
         return currentTick;
     }
     
+    /**
+     * 动画是否正在播放。
+     */
     public boolean isActive() {
         return this.isRunning;
     }
     
+    /**
+     * 将 VMD 动画的位置/旋转数据应用至指定的 ModelPart。
+     */
     public void updatePart(String partName, ModelPart part) {
         Vec3f pos = this.get3DTransform(partName, TransformType.POSITION, new Vec3f(part.x, part.y, part.z));
         part.x = pos.getX();
@@ -149,6 +191,11 @@ public class VanillaConvertedVmdAnimation {
         part.setRotation(rot.getX(), rot.getY(), rot.getZ());
     }
     
+    /**
+     * 获取指定骨骼在 VMD 当前位置/旋转下的 3D 变换值。
+     * <p>
+     * 若该骨骼被禁用混合则返回原始值。
+     */
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     public Vec3f get3DTransform(String boneName, TransformType type, Vec3f value0) {
         this.setupAnim();
@@ -193,6 +240,9 @@ public class VanillaConvertedVmdAnimation {
         return value0;
     }
     
+    /**
+     * 将四元数转换为 ZYX 欧拉角。
+     */
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
     Vector3d quaternionToEulerZYX(Quaterniond qt) {
         Vector3d tmp = new Vector3d();
@@ -218,6 +268,9 @@ public class VanillaConvertedVmdAnimation {
     }
     
     
+    /**
+     * 根据当前 tick 更新 MMD 动作播放器的帧状态。
+     */
     public void setupAnim() {
         if (!MOTION_PLAYER.isPresent()) {
             return;

@@ -14,6 +14,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * 隔空瞬步专用的幻影剑实体。
+ * <p>
+ * 碰撞目标后触发隔空瞬步传送，并在首次 Tick 强制命中指定目标以实现位置同步。
+ */
 public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
     @Nullable
     private Entity target;
@@ -27,18 +32,30 @@ public class EntityAirTrickSummonedSword extends EntityAbstractSummonedSword {
         return new EntityAirTrickSummonedSword(MrqxSlashBladeCore.RegistryEvents.AirTrickSummonedSword, worldIn);
     }
     
+    /**
+     * 获取此剑预设的目标实体。
+     */
     public @Nullable Entity getTarget() {
         return target;
     }
     
+    /**
+     * 设置此剑预设的目标实体。
+     */
     public void setTarget(Entity target) {
         this.target = target;
     }
     
+    /**
+     * 获取传送后是否启用无敌帧。
+     */
     public boolean isShouldUntouchable() {
         return shouldUntouchable;
     }
     
+    /**
+     * 设置传送后是否启用无敌帧。
+     */
     public void setShouldUntouchable(boolean shouldUntouchable) {
         this.shouldUntouchable = shouldUntouchable;
     }

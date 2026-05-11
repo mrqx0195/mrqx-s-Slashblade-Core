@@ -19,11 +19,17 @@ import net.mrqx.sbr_core.entity.EntityAirTrickSummonedSword;
 import net.mrqx.sbr_core.network.NetworkManager;
 import org.slf4j.Logger;
 
+/**
+ * MrqxSlashBladeCore 模组主类。
+ */
 @Mod(MrqxSlashBladeCore.MODID)
 public class MrqxSlashBladeCore {
     public static final String MODID = "sbr_core";
     public static final Logger LOGGER = LogUtils.getLogger();
     
+    /**
+     * 将给定的字符串路径前缀化为此模组的命名空间路径。
+     */
     public static ResourceLocation prefix(String s) {
         return ResourceLocation.fromNamespaceAndPath(MODID, s);
     }
@@ -52,6 +58,9 @@ public class MrqxSlashBladeCore {
             event.registerEntityRenderer(AirTrickSummonedSword, SummonedSwordRenderer::new);
         }
         
+        /**
+         * 将实体类名转换为小写下划线格式的资源路径后缀。
+         */
         @SuppressWarnings("SameParameterValue")
         private static String classToString(Class<? extends Entity> entityClass) {
             return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entityClass.getSimpleName()).replace("entity_", "");
