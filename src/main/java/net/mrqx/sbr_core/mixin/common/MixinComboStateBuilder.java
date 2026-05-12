@@ -2,7 +2,7 @@ package net.mrqx.sbr_core.mixin.common;
 
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import net.mrqx.sbr_core.events.ComboStateRegistryEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.fml.ModLoader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,7 +13,7 @@ public abstract class MixinComboStateBuilder {
     @SuppressWarnings("DataFlowIssue")
     @Inject(method = "build()Lmods/flammpfeil/slashblade/registry/combo/ComboState;", at = @At(value = "HEAD"), remap = false)
     public void injectBuild(CallbackInfoReturnable<ComboState> ci) {
-        NeoForge.EVENT_BUS.post(new ComboStateRegistryEvent((ComboState.Builder) (Object) this,
+        ModLoader.postEvent(new ComboStateRegistryEvent((ComboState.Builder) (Object) this,
             AccessorComboState.createComboState((ComboState.Builder) (Object) this)));
     }
 }
