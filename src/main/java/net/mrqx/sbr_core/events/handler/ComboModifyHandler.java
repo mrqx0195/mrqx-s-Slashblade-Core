@@ -7,6 +7,7 @@ import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.events.ComboStateRegistryEvent;
+import net.mrqx.sbr_core.utils.AdditionalTimeLineTickAction;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 
@@ -30,7 +31,7 @@ public class ComboModifyHandler {
         if (combo.getStartFrame() == ComboMovementModifiers.UPPER_SLASH.startFrame
             && combo.getEndFrame() == ComboMovementModifiers.UPPER_SLASH.endFrame
             && combo.getPriority() == ComboMovementModifiers.UPPER_SLASH.priority) {
-            builder.addTickAction(ComboState.TimeLineTickAction.getBuilder().put(9, livingEntity -> {
+            builder.addTickAction(AdditionalTimeLineTickAction.getBuilder().put(9, livingEntity -> {
                 if (livingEntity instanceof ISlashBladeEntity slashBladeEntity && slashBladeEntity.useUpperSlashJump()) {
                     BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
                         state.updateComboSeq(livingEntity, UPPER_SLASH_NAME);
